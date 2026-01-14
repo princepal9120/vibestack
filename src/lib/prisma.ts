@@ -1,6 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { Pool } from "pg";
-import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaNeon } from "@prisma/adapter-neon";
 
 const globalForPrisma = globalThis as unknown as {
     prisma: PrismaClient | undefined;
@@ -10,22 +9,15 @@ function createPrismaClient() {
     const connectionString = process.env.DATABASE_URL;
 
     if (!connectionString) {
-        throw new Error("DATABASE_URL is not defined");
+        throw new Error("DATABASE_URL environment variable is not defined. Please check your .env file.");
     }
 
-    const pool = new Pool({
-        connectionString,
-        max: 10, // Connection pool size
-    });
-
-    const adapter = new PrismaPg(pool);
+    // PrismaNeon uses the pooled connection string for queries
+    const adapter = new PrismaNeon({ connectionString });
 
     return new PrismaClient({
         adapter,
-        log:
-            process.env.NODE_ENV === "development"
-                ? ["query", "error", "warn"]
-                : ["error"],
+        log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
     });
 }
 
