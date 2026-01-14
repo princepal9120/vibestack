@@ -1,0 +1,160 @@
+// Vibe Stack - Prisma Schema
+// Based on Tech Spec v1.0
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// =============================================================================
+// User Model (synced from Clerk via webhook)
+// =============================================================================
+model User {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique
+  email     String   @unique
+  username  String   @unique
+  avatar    String?
+  bio       String?
+  githubUrl String?
+  twitterUrl String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  projects  Project[]
+  comments  Comment[]
+  upvotes   Upvote[]
+
+  @@index([clerkId])
+  @@index([username])
+}
+
+// =============================================================================
+// Project Model
+// =============================================================================
+model Project {
+  id              String   @id @default(cuid())
+  title           String
+  description     String
+  longDescription String?  @db.Text
+  
+  // Author relation
+  authorId        String
+  author          User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  
+  // Categorization
+  platforms       String[] // e.g., ["cursor", "claude-code"]
+  techStack       String[] // e.g., ["react", "typescript", "tailwind"]
+  category        String   // e.g., "web-app", "cli", "mobile"
+  
+  // Links
+  githubUrl       String?
+  liveUrl         String?
+  
+  // Media
+  screenshots     String[] // Cloudinary URLs
+  
+  // Content
+  keyInsights     String?  @db.Text // Markdown
+  
+  // Denormalized counts (for performance)
+  upvoteCount     Int      @default(0)
+  commentCount    Int      @default(0)
+  viewCount       Int      @default(0)
+  
+  // Flags
+  featured        Boolean  @default(false)
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  comments        Comment[]
+  upvotes         Upvote[]
+
+  @@index([authorId])
+  @@index([category, createdAt(sort: Desc)])
+  @@index([upvoteCount(sort: Desc), createdAt(sort: Desc)])
+}
+
+// =============================================================================
+// Comment Model
+// =============================================================================
+model Comment {
+  id          String   @id @default(cuid())
+  content     String   @db.Text
+  
+  // Relations
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([projectId])
+  @@index([authorId])
+}
+
+// =============================================================================
+// Upvote Model
+// =============================================================================
+model Upvote {
+  id        String   @id @default(cuid())
+  
+  // Relations
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+
+  @@unique([userId, projectId])
+  @@index([projectId])
+}
+
+// =============================================================================
+// Collection Model (Admin-curated)
+// =============================================================================
+model Collection {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String   @db.Text
+  projectIds  String[] // Array of project IDs
+  curator     String?  // Optional curator name
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([slug])
+}
+
+// =============================================================================
+// PlatformProfile Model (Static content for AI tools)
+// =============================================================================
+model PlatformProfile {
+  id          String   @id @default(cuid())
+  platformId  String   @unique // e.g., "cursor", "claude-code"
+  name        String   // e.g., "Cursor"
+  tagline     String?
+  websiteUrl  String?
+  description String   @db.Text
+  setupGuide  String   @db.Text // Markdown
+  cheatSheet  String[] // Array of key points
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([platformId])
+}
