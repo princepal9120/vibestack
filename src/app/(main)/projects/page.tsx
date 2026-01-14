@@ -1,12 +1,14 @@
 import { Suspense } from "react";
 import { Metadata } from "next";
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { ProjectCard } from "@/components/project-card";
 import { FilterBar } from "@/components/filter-bar";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-    title: "Projects",
+    title: "Projects | Vibe Stack",
     description: "Explore projects built with AI coding tools",
 };
 
@@ -17,6 +19,7 @@ interface ProjectsPageProps {
         search?: string;
         sort?: string;
         page?: string;
+        view?: string;
     }>;
 }
 
@@ -26,10 +29,10 @@ async function ProjectsGrid({
     searchParams: ProjectsPageProps["searchParams"];
 }) {
     const params = await searchParams;
-    const { platform, category, search, sort = "newest", page = "1" } = params;
+    const { platform, category, search, sort = "newest", page = "1", view = "list" } = params;
 
     const pageNum = parseInt(page);
-    const limit = 12;
+    const limit = view === "list" ? 20 : 12;
     const skip = (pageNum - 1) * limit;
 
     // Build where clause
@@ -86,43 +89,71 @@ async function ProjectsGrid({
     if (projects.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center py-16 text-center">
-                <p className="text-lg text-muted-foreground">No projects found</p>
+                <div className="text-6xl mb-4">🔍</div>
+                <p className="text-lg font-medium">No projects found</p>
                 <p className="text-sm text-muted-foreground mt-2">
                     Try adjusting your filters or search terms
                 </p>
+                <Link
+                    href="/projects/new"
+                    className="mt-6 inline-flex h-10 items-center justify-center rounded-lg bg-primary px-6 text-sm font-medium text-primary-foreground"
+                >
+                    Be the first to submit
+                </Link>
             </div>
         );
     }
 
     return (
         <>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {/* Projects List/Grid */}
+            <div className={cn(
+                view === "list"
+                    ? "space-y-3"
+                    : "grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+            )}>
                 {projects.map((project) => (
-                    <ProjectCard key={project.id} project={project} />
+                    <ProjectCard
+                        key={project.id}
+                        project={project}
+                        variant={view === "list" ? "list" : "grid"}
+                    />
                 ))}
             </div>
 
             {/* Pagination */}
             {totalPages > 1 && (
                 <div className="mt-8 flex justify-center gap-2">
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                        <a
-                            key={p}
-                            href={`/projects?${new URLSearchParams({
-                                ...(platform && { platform }),
-                                ...(category && { category }),
-                                ...(search && { search }),
-                                ...(sort && { sort }),
-                                page: p.toString(),
-                            }).toString()}`}
-                            className={`inline-flex h-10 w-10 items-center justify-center rounded-lg border text-sm font-medium transition-colors ${p === pageNum
-                                    ? "bg-primary text-primary-foreground"
-                                    : "bg-background hover:bg-muted"
-                                }`}
-                        >
-                            {p}
-                        </a>
-                    ))}
+                    {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                        const p = i + 1;
+                        const searchParamsObj = new URLSearchParams();
+                        if (platform) searchParamsObj.set("platform", platform);
+                        if (category) searchParamsObj.set("category", category);
+                        if (search) searchParamsObj.set("search", search);
+                        if (sort) searchParamsObj.set("sort", sort);
+                        if (view) searchParamsObj.set("view", view);
+                        searchParamsObj.set("page", p.toString());
+
+                        return (
+                            <a
+                                key={p}
+                                href={`/projects?${searchParamsObj.toString()}`}
+                                className={cn(
+                                    "inline-flex h-10 w-10 items-center justify-center rounded-lg border text-sm font-medium transition-colors",
+                                    p === pageNum
+                                        ? "bg-primary text-primary-foreground border-primary"
+                                        : "bg-card border-border hover:bg-accent"
+                                )}
+                            >
+                                {p}
+                            </a>
+                        );
+                    })}
+                    {totalPages > 5 && (
+                        <span className="inline-flex h-10 items-center px-2 text-muted-foreground">
+                            ...
+                        </span>
+                    )}
                 </div>
             )}
         </>
@@ -131,36 +162,78 @@ async function ProjectsGrid({
 
 function ProjectsGridSkeleton() {
     return (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="rounded-xl border bg-card p-4 space-y-4">
-                    <Skeleton className="aspect-video rounded-lg" />
-                    <Skeleton className="h-6 w-3/4" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-1/2" />
+        <div className="space-y-3">
+            {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="flex items-center gap-4 rounded-xl border border-border bg-card p-4">
+                    <Skeleton className="h-16 w-16 rounded-xl" />
+                    <div className="flex-1 space-y-2">
+                        <Skeleton className="h-5 w-3/4" />
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-3 w-1/2" />
+                    </div>
+                    <Skeleton className="h-16 w-14 rounded-lg" />
                 </div>
             ))}
         </div>
     );
 }
 
-export default async function ProjectsPage({ searchParams }: ProjectsPageProps) {
+// Sort tabs component
+function SortTabs({ currentSort }: { currentSort: string }) {
+    const tabs = [
+        { value: "newest", label: "Newest" },
+        { value: "trending", label: "Trending" },
+        { value: "popular", label: "Popular" },
+    ];
+
     return (
-        <div className="container py-8 space-y-8">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
-                <p className="mt-2 text-muted-foreground">
-                    Explore projects built with AI coding tools
-                </p>
+        <div className="flex gap-1 rounded-lg bg-muted p-1">
+            {tabs.map((tab) => (
+                <a
+                    key={tab.value}
+                    href={`/projects?sort=${tab.value}`}
+                    className={cn(
+                        "inline-flex h-8 items-center justify-center rounded-md px-4 text-sm font-medium transition-colors",
+                        currentSort === tab.value
+                            ? "bg-card text-foreground shadow-sm"
+                            : "text-muted-foreground hover:text-foreground"
+                    )}
+                >
+                    {tab.label}
+                </a>
+            ))}
+        </div>
+    );
+}
+
+export default async function ProjectsPage({ searchParams }: ProjectsPageProps) {
+    const params = await searchParams;
+    const sort = params.sort || "newest";
+
+    return (
+        <div className="dark-mode min-h-screen">
+            <div className="container py-8 space-y-8">
+                {/* Header */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div>
+                        <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
+                        <p className="mt-1 text-muted-foreground">
+                            Explore projects built with AI coding tools
+                        </p>
+                    </div>
+                    <SortTabs currentSort={sort} />
+                </div>
+
+                {/* Filter Bar */}
+                <Suspense fallback={<div className="h-12 animate-pulse bg-muted rounded-lg" />}>
+                    <FilterBar />
+                </Suspense>
+
+                {/* Projects */}
+                <Suspense fallback={<ProjectsGridSkeleton />}>
+                    <ProjectsGrid searchParams={searchParams} />
+                </Suspense>
             </div>
-
-            <Suspense fallback={<div className="h-20 animate-pulse bg-muted rounded-lg" />}>
-                <FilterBar />
-            </Suspense>
-
-            <Suspense fallback={<ProjectsGridSkeleton />}>
-                <ProjectsGrid searchParams={searchParams} />
-            </Suspense>
         </div>
     );
 }

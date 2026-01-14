@@ -2,7 +2,7 @@ import { config } from "dotenv";
 config({ path: ".env" });
 
 import { PrismaClient } from "@prisma/client";
-import { PrismaNeonHttp } from "@prisma/adapter-neon";
+import { PrismaNeon } from "@prisma/adapter-neon";
 
 function createPrismaClient() {
     const connectionString = process.env.DATABASE_URL;
@@ -10,8 +10,8 @@ function createPrismaClient() {
         throw new Error("DATABASE_URL is not set");
     }
 
-    // PrismaNeonHttp takes the connection string directly
-    const adapter = new PrismaNeonHttp(connectionString, {});
+    // PrismaNeon uses connectionString parameter
+    const adapter = new PrismaNeon({ connectionString });
 
     return new PrismaClient({ adapter });
 }
