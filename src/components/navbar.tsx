@@ -4,26 +4,59 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
-import { Menu, X, Sparkles } from "lucide-react";
-import { useState } from "react";
+import {
+    Menu,
+    X,
+    Sparkles,
+    ChevronDown,
+    MessageSquare,
+    Zap,
+    Users,
+    BookOpen,
+    Server,
+} from "lucide-react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+// Simplified navigation with 4 main items
 const navItems = [
     { href: "/projects", label: "Projects" },
-    { href: "/profiles", label: "Platforms" },
-    { href: "/workflows", label: "Workflows" },
-    { href: "/prompts", label: "Prompts" },
+];
+
+// Collections dropdown items
+const collectionsItems = [
+    { href: "/collections/prompts", label: "Prompts", icon: MessageSquare, description: "Copy-paste ready prompts" },
+    { href: "/collections/subagents", label: "Sub-Agents", icon: Users, description: "Role-specific AI agents" },
+    { href: "/collections/workflows", label: "Workflows", icon: Zap, description: "Best practices & guides" },
+    { href: "/collections/mcps", label: "MCPs", icon: Server, description: "Model Context Protocol" },
+];
+
+const rightNavItems = [
+    { href: "/platforms", label: "Platforms" },
     { href: "/resources", label: "Resources" },
-    { href: "/guides", label: "Guides" },
-    { href: "/collections", label: "Collections" },
 ];
 
 export function Navbar() {
     const pathname = usePathname();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [collectionsOpen, setCollectionsOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setCollectionsOpen(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    const isCollectionsActive = pathname.startsWith("/collections");
 
     return (
-        <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md">
+        <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md">
             <nav className="container flex h-16 items-center justify-between">
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-2">
@@ -32,15 +65,90 @@ export function Navbar() {
                 </Link>
 
                 {/* Desktop Navigation */}
-                <div className="hidden md:flex md:items-center md:gap-6">
+                <div className="hidden md:flex md:items-center md:gap-1">
+                    {/* Projects */}
                     {navItems.map((item) => (
                         <Link
                             key={item.href}
                             href={item.href}
                             className={cn(
-                                "text-sm font-medium transition-colors hover:text-primary",
+                                "px-4 py-2 text-sm font-medium rounded-lg transition-colors hover:bg-accent",
                                 pathname.startsWith(item.href)
-                                    ? "text-primary"
+                                    ? "text-primary bg-primary/5"
+                                    : "text-muted-foreground"
+                            )}
+                        >
+                            {item.label}
+                        </Link>
+                    ))}
+
+                    {/* Collections Dropdown */}
+                    <div className="relative" ref={dropdownRef}>
+                        <button
+                            onClick={() => setCollectionsOpen(!collectionsOpen)}
+                            onMouseEnter={() => setCollectionsOpen(true)}
+                            className={cn(
+                                "flex items-center gap-1 px-4 py-2 text-sm font-medium rounded-lg transition-colors hover:bg-accent",
+                                isCollectionsActive
+                                    ? "text-primary bg-primary/5"
+                                    : "text-muted-foreground"
+                            )}
+                        >
+                            Collections
+                            <ChevronDown className={cn(
+                                "h-4 w-4 transition-transform duration-200",
+                                collectionsOpen && "rotate-180"
+                            )} />
+                        </button>
+
+                        <AnimatePresence>
+                            {collectionsOpen && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                                    transition={{ duration: 0.15 }}
+                                    onMouseLeave={() => setCollectionsOpen(false)}
+                                    className="absolute top-full left-0 mt-2 w-64 rounded-xl border border-border bg-card p-2 shadow-xl shadow-black/10"
+                                >
+                                    {collectionsItems.map((item) => (
+                                        <Link
+                                            key={item.href}
+                                            href={item.href}
+                                            onClick={() => setCollectionsOpen(false)}
+                                            className={cn(
+                                                "flex items-start gap-3 rounded-lg p-3 transition-colors hover:bg-accent",
+                                                pathname.startsWith(item.href) && "bg-primary/5"
+                                            )}
+                                        >
+                                            <item.icon className="h-5 w-5 text-muted-foreground mt-0.5" />
+                                            <div>
+                                                <div className={cn(
+                                                    "text-sm font-medium",
+                                                    pathname.startsWith(item.href) ? "text-primary" : "text-foreground"
+                                                )}>
+                                                    {item.label}
+                                                </div>
+                                                <div className="text-xs text-muted-foreground">
+                                                    {item.description}
+                                                </div>
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+
+                    {/* Right nav items */}
+                    {rightNavItems.map((item) => (
+                        <Link
+                            key={item.href}
+                            href={item.href}
+                            className={cn(
+                                "px-4 py-2 text-sm font-medium rounded-lg transition-colors hover:bg-accent",
+                                pathname.startsWith(item.href)
+                                    ? "text-primary bg-primary/5"
                                     : "text-muted-foreground"
                             )}
                         >
@@ -50,19 +158,19 @@ export function Navbar() {
                 </div>
 
                 {/* Auth & Actions */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
                     <SignedIn>
                         <Link
                             href="/projects/new"
-                            className="hidden sm:inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90"
+                            className="hidden sm:inline-flex h-9 items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90"
                         >
-                            Upload Project
+                            Submit Project
                         </Link>
                         <UserButton afterSignOutUrl="/" />
                     </SignedIn>
                     <SignedOut>
                         <SignInButton mode="modal">
-                            <button className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90">
+                            <button className="inline-flex h-9 items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90">
                                 Sign In
                             </button>
                         </SignInButton>
@@ -70,7 +178,7 @@ export function Navbar() {
 
                     {/* Mobile Menu Toggle */}
                     <button
-                        className="md:hidden p-2"
+                        className="md:hidden p-2 rounded-lg hover:bg-accent"
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                     >
                         {mobileMenuOpen ? (
@@ -89,31 +197,73 @@ export function Navbar() {
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
                         exit={{ opacity: 0, height: 0 }}
-                        className="md:hidden border-t bg-background"
+                        className="md:hidden border-t border-border bg-background"
                     >
-                        <div className="container py-4 space-y-2">
+                        <div className="container py-4 space-y-1">
+                            {/* Projects */}
                             {navItems.map((item) => (
                                 <Link
                                     key={item.href}
                                     href={item.href}
                                     onClick={() => setMobileMenuOpen(false)}
                                     className={cn(
-                                        "block py-2 text-sm font-medium transition-colors hover:text-primary",
+                                        "block py-3 px-3 rounded-lg text-sm font-medium transition-colors hover:bg-accent",
                                         pathname.startsWith(item.href)
-                                            ? "text-primary"
+                                            ? "text-primary bg-primary/5"
                                             : "text-muted-foreground"
                                     )}
                                 >
                                     {item.label}
                                 </Link>
                             ))}
+
+                            {/* Collections Section */}
+                            <div className="py-2">
+                                <div className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                                    Collections
+                                </div>
+                                {collectionsItems.map((item) => (
+                                    <Link
+                                        key={item.href}
+                                        href={item.href}
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className={cn(
+                                            "flex items-center gap-3 py-3 px-3 rounded-lg text-sm font-medium transition-colors hover:bg-accent",
+                                            pathname.startsWith(item.href)
+                                                ? "text-primary bg-primary/5"
+                                                : "text-muted-foreground"
+                                        )}
+                                    >
+                                        <item.icon className="h-4 w-4" />
+                                        {item.label}
+                                    </Link>
+                                ))}
+                            </div>
+
+                            {/* Right nav items */}
+                            {rightNavItems.map((item) => (
+                                <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    className={cn(
+                                        "block py-3 px-3 rounded-lg text-sm font-medium transition-colors hover:bg-accent",
+                                        pathname.startsWith(item.href)
+                                            ? "text-primary bg-primary/5"
+                                            : "text-muted-foreground"
+                                    )}
+                                >
+                                    {item.label}
+                                </Link>
+                            ))}
+
                             <SignedIn>
                                 <Link
                                     href="/projects/new"
                                     onClick={() => setMobileMenuOpen(false)}
-                                    className="block py-2 text-sm font-medium text-primary"
+                                    className="block py-3 px-3 rounded-lg text-sm font-medium text-primary bg-primary/5"
                                 >
-                                    Upload Project
+                                    Submit Project
                                 </Link>
                             </SignedIn>
                         </div>

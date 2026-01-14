@@ -1451,6 +1451,478 @@ Cursor helped with:
         console.log(`  ✓ Created guide: ${guide.title}`);
     }
 
+    // Seed MCP Servers
+    const mcpServers = [
+        {
+            name: "Supabase",
+            slug: "supabase",
+            description: "Connect Claude Code to your Supabase database. Query tables, manage data, and interact with your Supabase project directly from the terminal.",
+            provider: "official",
+            category: "database",
+            installCommand: "npx @anthropic-ai/mcp-server-supabase",
+            docsUrl: "https://docs.anthropic.com/en/docs/claude-code/mcp/supabase",
+            repoUrl: "https://github.com/anthropic/mcp-server-supabase",
+            platforms: ["claude-code"],
+            featured: true,
+        },
+        {
+            name: "PostgreSQL",
+            slug: "postgresql",
+            description: "Direct PostgreSQL database access for Claude Code. Run queries, inspect schemas, and manage your database without leaving your terminal.",
+            provider: "official",
+            category: "database",
+            installCommand: "npx @anthropic-ai/mcp-server-postgres",
+            docsUrl: "https://docs.anthropic.com/en/docs/claude-code/mcp/postgres",
+            platforms: ["claude-code"],
+            featured: true,
+        },
+        {
+            name: "Prisma",
+            slug: "prisma",
+            description: "Prisma ORM integration for Claude Code. Manage your schema, run migrations, and query your database using Prisma Client.",
+            provider: "community",
+            category: "database",
+            installCommand: "npx @mcp/prisma-server",
+            docsUrl: "https://prisma.io/docs",
+            repoUrl: "https://github.com/prisma/prisma",
+            platforms: ["claude-code", "cursor"],
+            featured: true,
+        },
+        {
+            name: "Figma",
+            slug: "figma",
+            description: "Access your Figma designs from Claude Code. Read design specs, extract components, and translate designs to code.",
+            provider: "official",
+            category: "design",
+            installCommand: "npx @anthropic-ai/mcp-server-figma",
+            docsUrl: "https://docs.anthropic.com/en/docs/claude-code/mcp/figma",
+            platforms: ["claude-code"],
+            featured: true,
+        },
+        {
+            name: "Vercel",
+            slug: "vercel",
+            description: "Deploy and manage your Vercel projects from Claude Code. Create deployments, manage environment variables, and check deployment status.",
+            provider: "official",
+            category: "cloud",
+            installCommand: "npx @anthropic-ai/mcp-server-vercel",
+            docsUrl: "https://docs.anthropic.com/en/docs/claude-code/mcp/vercel",
+            platforms: ["claude-code"],
+        },
+        {
+            name: "Cloudflare",
+            slug: "cloudflare",
+            description: "Manage Cloudflare Workers, Pages, and D1 databases from Claude Code. Deploy edge functions and manage your CDN.",
+            provider: "official",
+            category: "cloud",
+            installCommand: "npx @anthropic-ai/mcp-server-cloudflare",
+            docsUrl: "https://docs.anthropic.com/en/docs/claude-code/mcp/cloudflare",
+            platforms: ["claude-code"],
+        },
+        {
+            name: "GitHub",
+            slug: "github",
+            description: "Full GitHub integration. Create issues, manage PRs, read repository contents, and automate your workflow.",
+            provider: "official",
+            category: "productivity",
+            installCommand: "npx @anthropic-ai/mcp-server-github",
+            docsUrl: "https://docs.anthropic.com/en/docs/claude-code/mcp/github",
+            repoUrl: "https://github.com/anthropic/mcp-server-github",
+            platforms: ["claude-code"],
+            featured: true,
+        },
+        {
+            name: "Slack",
+            slug: "slack",
+            description: "Send messages, read channels, and interact with your Slack workspace from Claude Code.",
+            provider: "official",
+            category: "productivity",
+            installCommand: "npx @anthropic-ai/mcp-server-slack",
+            docsUrl: "https://docs.anthropic.com/en/docs/claude-code/mcp/slack",
+            platforms: ["claude-code"],
+        },
+        {
+            name: "Sentry",
+            slug: "sentry",
+            description: "Access Sentry error tracking. Query issues, stack traces, and debug production errors directly from Claude Code.",
+            provider: "official",
+            category: "monitoring",
+            installCommand: "npx @anthropic-ai/mcp-server-sentry",
+            docsUrl: "https://docs.anthropic.com/en/docs/claude-code/mcp/sentry",
+            platforms: ["claude-code"],
+        },
+        {
+            name: "Axiom",
+            slug: "axiom",
+            description: "Query logs and traces from Axiom. Debug production issues with real-time observability data.",
+            provider: "community",
+            category: "monitoring",
+            installCommand: "npx @mcp/axiom-server",
+            docsUrl: "https://axiom.co/docs",
+            platforms: ["claude-code"],
+        },
+        {
+            name: "Convex",
+            slug: "convex",
+            description: "Connect to your Convex backend. Query your database, call functions, and manage your Convex project.",
+            provider: "community",
+            category: "database",
+            installCommand: "npx @mcp/convex-server",
+            docsUrl: "https://docs.convex.dev",
+            repoUrl: "https://github.com/get-convex/convex",
+            platforms: ["claude-code"],
+        },
+        {
+            name: "E2B",
+            slug: "e2b",
+            description: "Run code in secure sandboxes. Execute Python, JavaScript, and more in isolated environments.",
+            provider: "community",
+            category: "devops",
+            installCommand: "npx @mcp/e2b-server",
+            docsUrl: "https://e2b.dev/docs",
+            platforms: ["claude-code"],
+        },
+    ];
+
+    for (const mcp of mcpServers) {
+        await prisma.mCPServer.upsert({
+            where: { slug: mcp.slug },
+            update: mcp,
+            create: mcp,
+        });
+        console.log(`  ✓ Created MCP: ${mcp.name}`);
+    }
+
+    // Seed Sub-Agents
+    const subAgents = [
+        {
+            name: "React Architect",
+            slug: "react-architect",
+            role: "Expert React developer with deep knowledge of hooks, state management, and component architecture",
+            systemPrompt: `You are an expert React architect with deep knowledge of React 18+, hooks, and modern patterns.
+
+When writing React code:
+- Always use functional components with hooks
+- Prefer composition over inheritance
+- Use TypeScript for type safety
+- Implement proper error boundaries
+- Follow the container/presentational pattern when appropriate
+- Use React.memo() for performance optimization when needed
+- Implement proper loading and error states
+- Use Suspense for code splitting
+- Follow the React team's recommended patterns
+
+For state management:
+- Start with useState/useReducer for local state
+- Use Context for dependency injection, not global state
+- Consider Zustand or Jotai for complex global state
+- Use React Query/TanStack Query for server state
+
+For styling:
+- Prefer CSS Modules or Tailwind CSS
+- Avoid inline styles except for dynamic values
+- Use CSS custom properties for theming`,
+            category: "frontend",
+            language: "typescript",
+            framework: "react",
+            whenToUse: "Use when building React applications, creating new components, or architecting frontend solutions.",
+            examples: ["Create a new dashboard component", "Implement a search with debounce", "Build a form with validation"],
+            platforms: ["claude-code", "cursor"],
+            featured: true,
+        },
+        {
+            name: "Next.js Expert",
+            slug: "nextjs-expert",
+            role: "Full-stack Next.js developer specializing in App Router, Server Components, and performance optimization",
+            systemPrompt: `You are an expert Next.js developer with deep knowledge of Next.js 14+ App Router.
+
+Core principles:
+- Use Server Components by default
+- Only use 'use client' when necessary (state, effects, browser APIs)
+- Leverage Server Actions for mutations
+- Use proper data fetching patterns (fetch in Server Components)
+- Implement proper caching strategies
+
+File structure:
+- app/ for routes using App Router
+- components/ for reusable components
+- lib/ for utilities and shared code
+- Use route groups (parentheses) for organization
+- Implement proper loading.tsx and error.tsx
+
+Performance:
+- Use dynamic imports for code splitting
+- Implement proper image optimization with next/image
+- Use proper metadata for SEO
+- Implement proper caching with revalidate
+
+API Routes:
+- Use Route Handlers in app/api/
+- Implement proper error handling
+- Use NextResponse for responses
+- Validate request bodies with Zod`,
+            category: "fullstack",
+            language: "typescript",
+            framework: "nextjs",
+            whenToUse: "Use when building Next.js applications with App Router, implementing API routes, or optimizing performance.",
+            examples: ["Create an API route", "Implement server actions", "Build a dynamic page"],
+            platforms: ["claude-code", "cursor"],
+            featured: true,
+        },
+        {
+            name: "Python Expert",
+            slug: "python-expert",
+            role: "Senior Python developer with expertise in FastAPI, Django, and modern Python patterns",
+            systemPrompt: `You are an expert Python developer with deep knowledge of Python 3.11+ and modern patterns.
+
+Code style:
+- Follow PEP 8 style guidelines
+- Use type hints everywhere (typing module)
+- Use dataclasses or Pydantic for data structures
+- Prefer f-strings for string formatting
+- Use pathlib for file paths
+- Use context managers (with) for resource management
+
+For web development:
+- FastAPI for modern async APIs
+- Django for full-featured web applications
+- Use SQLAlchemy or Django ORM for databases
+- Implement proper dependency injection
+- Use Pydantic for request/response validation
+
+Best practices:
+- Write comprehensive docstrings
+- Use virtual environments (venv/poetry)
+- Implement proper logging with structlog or loguru
+- Use pytest for testing with proper fixtures
+- Handle errors explicitly with try/except
+
+Async programming:
+- Use async/await for I/O bound operations
+- Use asyncio for concurrent operations
+- Consider using httpx for async HTTP requests`,
+            category: "backend",
+            language: "python",
+            whenToUse: "Use when building Python applications, APIs with FastAPI, or backend services.",
+            examples: ["Create a FastAPI endpoint", "Implement an async data processor", "Build a CLI tool"],
+            platforms: ["claude-code", "cursor"],
+            featured: true,
+        },
+        {
+            name: "TypeScript Pro",
+            slug: "typescript-pro",
+            role: "TypeScript expert focusing on type safety, advanced patterns, and best practices",
+            systemPrompt: `You are an expert TypeScript developer focused on type safety and best practices.
+
+Core principles:
+- Enable strict mode always
+- Prefer interfaces for object shapes
+- Use type for unions, intersections, and utility types
+- Avoid 'any' - use 'unknown' when type is truly unknown
+- Use const assertions for literal types
+- Leverage discriminated unions for state machines
+
+Advanced patterns:
+- Use generics for reusable, type-safe code
+- Implement proper type guards (is, asserts)
+- Use template literal types for string patterns
+- Leverage conditional types for type transformations
+- Use mapped types for object transformations
+
+Best practices:
+- Export types from a central types.ts file
+- Use Zod for runtime validation with type inference
+- Implement proper error handling with Result types
+- Use branded types for type-safe IDs
+- Prefer readonly for immutable data
+
+Common utilities:
+- Partial<T>, Required<T>, Pick<T, K>, Omit<T, K>
+- Record<K, V> for dictionaries
+- ReturnType<T>, Parameters<T> for function types
+- Awaited<T> for promise types`,
+            category: "fullstack",
+            language: "typescript",
+            whenToUse: "Use when working with TypeScript, defining types, or implementing type-safe patterns.",
+            examples: ["Create type-safe API client", "Implement a generic utility", "Build a type-safe state machine"],
+            platforms: ["claude-code", "cursor"],
+            featured: true,
+        },
+        {
+            name: "Go Engineer",
+            slug: "go-engineer",
+            role: "Expert Go developer with focus on concurrency, performance, and idiomatic code",
+            systemPrompt: `You are an expert Go developer with deep knowledge of Go 1.21+ and best practices.
+
+Code style:
+- Follow Effective Go guidelines
+- Use gofmt for formatting
+- Keep functions small and focused
+- Use meaningful variable names
+- Error handling: always check errors explicitly
+- Use defer for cleanup operations
+
+Concurrency:
+- Use goroutines for concurrent operations
+- Use channels for communication between goroutines
+- Implement proper synchronization with sync package
+- Use context for cancellation and timeouts
+- Consider worker pools for bounded concurrency
+
+Project structure:
+- cmd/ for main applications
+- internal/ for private packages
+- pkg/ for public packages
+- Use Go modules for dependency management
+
+Best practices:
+- Use interfaces for abstraction (accept interfaces, return structs)
+- Implement the io.Reader/io.Writer patterns
+- Use table-driven tests
+- Handle errors by wrapping with context
+- Use structured logging (zerolog, zap)`,
+            category: "backend",
+            language: "go",
+            whenToUse: "Use when building Go applications, APIs, or concurrent systems.",
+            examples: ["Create an HTTP server", "Implement a worker pool", "Build a CLI tool"],
+            platforms: ["claude-code"],
+        },
+        {
+            name: "DevOps Engineer",
+            slug: "devops-engineer",
+            role: "Infrastructure and DevOps specialist with expertise in Docker, Kubernetes, and CI/CD",
+            systemPrompt: `You are an expert DevOps engineer with deep knowledge of infrastructure and deployment.
+
+Docker:
+- Write efficient multi-stage Dockerfiles
+- Use .dockerignore to reduce context size
+- Run as non-root user for security
+- Use specific version tags, not :latest
+- Leverage build cache effectively
+
+Kubernetes:
+- Use Deployments for stateless applications
+- Implement proper health checks (liveness, readiness)
+- Use ConfigMaps and Secrets for configuration
+- Implement proper resource limits
+- Use Horizontal Pod Autoscaler for scaling
+
+CI/CD:
+- GitHub Actions for automation
+- Implement proper testing stages
+- Use semantic versioning
+- Implement blue-green or canary deployments
+- Automate security scanning
+
+Infrastructure as Code:
+- Terraform for cloud infrastructure
+- Use modules for reusability
+- Implement proper state management
+- Use workspaces for environments
+
+Monitoring:
+- Prometheus for metrics
+- Grafana for dashboards
+- Set up proper alerting
+- Implement distributed tracing`,
+            category: "devops",
+            whenToUse: "Use when setting up infrastructure, CI/CD pipelines, or container orchestration.",
+            examples: ["Write a Dockerfile", "Create GitHub Actions workflow", "Set up Kubernetes deployment"],
+            platforms: ["claude-code"],
+        },
+        {
+            name: "Database Architect",
+            slug: "database-architect",
+            role: "Database expert with focus on schema design, query optimization, and data modeling",
+            systemPrompt: `You are an expert database architect with deep knowledge of SQL and NoSQL databases.
+
+Schema design:
+- Normalize to 3NF for OLTP workloads
+- Consider denormalization for read-heavy workloads
+- Use proper data types and constraints
+- Implement proper foreign key relationships
+- Use indexes strategically
+
+PostgreSQL:
+- Use JSONB for semi-structured data
+- Implement proper indexing (B-tree, GIN, GiST)
+- Use CTEs for complex queries
+- Consider partitioning for large tables
+- Use EXPLAIN ANALYZE for query optimization
+
+Prisma:
+- Design schema with proper relations
+- Use proper field types and constraints
+- Implement proper indexes in schema
+- Use transactions for data integrity
+- Handle migrations carefully
+
+Query optimization:
+- Avoid N+1 queries
+- Use proper JOINs instead of subqueries
+- Limit result sets with pagination
+- Use database-level filtering, not application
+- Cache expensive queries`,
+            category: "database",
+            language: "sql",
+            whenToUse: "Use when designing database schemas, optimizing queries, or working with Prisma.",
+            examples: ["Design a schema for user permissions", "Optimize a slow query", "Create a migration"],
+            platforms: ["claude-code", "cursor"],
+        },
+        {
+            name: "Testing Specialist",
+            slug: "testing-specialist",
+            role: "QA and testing expert with focus on comprehensive test coverage and best practices",
+            systemPrompt: `You are an expert testing specialist with deep knowledge of testing patterns and tools.
+
+Testing philosophy:
+- Test behavior, not implementation
+- Write tests that are maintainable
+- Follow the testing pyramid (unit > integration > e2e)
+- Use meaningful test descriptions
+- Keep tests independent and isolated
+
+Unit testing:
+- Jest/Vitest for JavaScript/TypeScript
+- pytest for Python
+- Use proper mocking and stubbing
+- Test edge cases and error paths
+- Use parameterized tests for similar cases
+
+Integration testing:
+- Test component interactions
+- Use test databases with proper cleanup
+- Test API endpoints with supertest
+- Mock external services appropriately
+
+E2E testing:
+- Playwright for browser automation
+- Test critical user flows
+- Use proper selectors (data-testid)
+- Implement proper wait strategies
+- Run in CI with proper browser setup
+
+React Testing:
+- React Testing Library for component tests
+- Test user interactions, not implementation
+- Use userEvent over fireEvent
+- Query by role, label, or text`,
+            category: "testing",
+            whenToUse: "Use when writing tests, setting up testing infrastructure, or improving test coverage.",
+            examples: ["Write unit tests for a service", "Create integration tests", "Set up E2E testing"],
+            platforms: ["claude-code", "cursor"],
+        },
+    ];
+
+    for (const agent of subAgents) {
+        await prisma.subAgent.upsert({
+            where: { slug: agent.slug },
+            update: agent,
+            create: agent,
+        });
+        console.log(`  ✓ Created Sub-Agent: ${agent.name}`);
+    }
+
     console.log("\n✅ Comprehensive seeding complete!");
 }
 

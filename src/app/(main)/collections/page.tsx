@@ -1,74 +1,97 @@
-import Link from "next/link";
 import { Metadata } from "next";
-import { prisma } from "@/lib/prisma";
-import { FolderOpen, ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { MessageSquare, Users, Zap, Server, ArrowRight } from "lucide-react";
 
 export const metadata: Metadata = {
-    title: "Collections",
-    description: "Curated collections of AI-assisted projects",
+    title: "Collections | Vibe Stack",
+    description: "Curated prompts, sub-agents, workflows, and MCPs for AI coding",
 };
 
-export default async function CollectionsPage() {
-    const collections = await prisma.collection.findMany({
-        orderBy: { createdAt: "desc" },
-    });
+const collections = [
+    {
+        title: "Prompts",
+        description: "Copy-paste ready prompts for coding, debugging, documentation, and more",
+        href: "/collections/prompts",
+        icon: MessageSquare,
+        count: "50+",
+        gradient: "from-blue-500/20 to-blue-600/10",
+    },
+    {
+        title: "Sub-Agents",
+        description: "Role-specific AI agent prompts for React, Python, TypeScript, and more",
+        href: "/collections/subagents",
+        icon: Users,
+        count: "25+",
+        gradient: "from-purple-500/20 to-purple-600/10",
+    },
+    {
+        title: "Workflows",
+        description: "Best practices, setup guides, and productivity hacks for AI tools",
+        href: "/collections/workflows",
+        icon: Zap,
+        count: "30+",
+        gradient: "from-amber-500/20 to-amber-600/10",
+    },
+    {
+        title: "MCPs",
+        description: "Model Context Protocol servers for database, cloud, and productivity integrations",
+        href: "/collections/mcps",
+        icon: Server,
+        count: "15+",
+        gradient: "from-emerald-500/20 to-emerald-600/10",
+    },
+];
 
-    if (collections.length === 0) {
-        return (
-            <div className="container py-8">
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold tracking-tight">Collections</h1>
-                    <p className="mt-2 text-muted-foreground">
-                        Curated collections of AI-assisted projects
-                    </p>
-                </div>
-
-                <div className="text-center py-16">
-                    <FolderOpen className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                    <p className="text-lg text-muted-foreground">
-                        Collections coming soon...
-                    </p>
-                    <p className="text-sm text-muted-foreground mt-2">
-                        We're curating the best projects for you
-                    </p>
-                </div>
-            </div>
-        );
-    }
-
+export default function CollectionsPage() {
     return (
-        <div className="container py-8">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold tracking-tight">Collections</h1>
-                <p className="mt-2 text-muted-foreground">
-                    Curated collections of AI-assisted projects
-                </p>
-            </div>
+        <div className="min-h-screen bg-background">
+            <div className="container py-12 space-y-12">
+                {/* Header */}
+                <div className="max-w-2xl">
+                    <h1 className="text-4xl font-bold tracking-tight">Collections</h1>
+                    <p className="mt-4 text-lg text-muted-foreground">
+                        Your curated library of AI coding knowledge. Browse prompts, discover sub-agents,
+                        learn workflows, and integrate MCPs.
+                    </p>
+                </div>
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {collections.map((collection) => (
-                    <Link
-                        key={collection.id}
-                        href={`/collections/${collection.slug}`}
-                        className="group relative overflow-hidden rounded-xl border bg-card p-6 shadow-sm transition-all hover:shadow-lg"
-                    >
-                        <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                            <FolderOpen className="h-6 w-6" />
-                        </div>
-                        <h3 className="text-xl font-semibold group-hover:text-primary transition-colors">
-                            {collection.title}
-                        </h3>
-                        <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
-                            {collection.description}
-                        </p>
-                        <div className="mt-4 flex items-center justify-between">
-                            <span className="text-sm text-muted-foreground">
-                                {collection.projectIds.length} projects
-                            </span>
-                            <ArrowRight className="h-4 w-4 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
-                        </div>
-                    </Link>
-                ))}
+                {/* Collections Grid */}
+                <div className="grid gap-6 md:grid-cols-2">
+                    {collections.map((collection) => (
+                        <Link
+                            key={collection.href}
+                            href={collection.href}
+                            className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1"
+                        >
+                            {/* Gradient Header */}
+                            <div className={`bg-gradient-to-br ${collection.gradient} p-6 pb-8`}>
+                                <div className="flex items-start justify-between">
+                                    <div className="h-12 w-12 rounded-xl bg-card/80 backdrop-blur flex items-center justify-center shadow">
+                                        <collection.icon className="h-6 w-6 text-foreground" />
+                                    </div>
+                                    <span className="rounded-full bg-card/80 backdrop-blur px-3 py-1 text-xs font-medium">
+                                        {collection.count}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Content */}
+                            <div className="flex-1 p-6 -mt-4 relative z-10">
+                                <h2 className="text-xl font-bold group-hover:text-primary transition-colors">
+                                    {collection.title}
+                                </h2>
+                                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                                    {collection.description}
+                                </p>
+
+                                <div className="mt-4 flex items-center gap-2 text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                                    Browse {collection.title.toLowerCase()}
+                                    <ArrowRight className="h-4 w-4" />
+                                </div>
+                            </div>
+                        </Link>
+                    ))}
+                </div>
             </div>
         </div>
     );

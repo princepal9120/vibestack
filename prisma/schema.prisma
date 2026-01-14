@@ -281,3 +281,80 @@ model EndToEndGuide {
   @@index([featured])
 }
 
+// =============================================================================
+// MCPServer Model (Model Context Protocol integrations)
+// =============================================================================
+model MCPServer {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String   @db.Text
+  
+  // Provider/source info
+  provider    String   // e.g., "official", "community"
+  category    String   // e.g., "database", "cloud", "monitoring", "design", "productivity"
+  
+  // Installation & Usage
+  installCommand String?  // e.g., "npm install @mcp/supabase"
+  configExample  String?  @db.Text // JSON/YAML config example
+  docsUrl        String?
+  repoUrl        String?
+  
+  // Visual
+  iconUrl     String?
+  
+  // Platforms it works with
+  platforms   String[] // ["claude-code", "cursor"]
+  
+  // Engagement
+  useCount    Int      @default(0)
+  featured    Boolean  @default(false)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([slug])
+  @@index([category])
+  @@index([featured])
+}
+
+// =============================================================================
+// SubAgent Model (Role-specific AI agent prompts)
+// =============================================================================
+model SubAgent {
+  id          String   @id @default(cuid())
+  name        String   // e.g., "React Architect", "Python Expert"
+  slug        String   @unique
+  
+  // Role/Persona
+  role        String   // Brief role description
+  systemPrompt String  @db.Text // The full system prompt
+  
+  // Categorization
+  category    String   // e.g., "frontend", "backend", "devops", "testing", "database", "mobile"
+  language    String?  // Primary language: "typescript", "python", "go", etc.
+  framework   String?  // Primary framework: "react", "nextjs", "django", etc.
+  
+  // Guidance
+  whenToUse   String?  @db.Text // When to trigger this sub-agent
+  examples    String[] // Example use cases
+  
+  // Platforms it works with  
+  platforms   String[] // ["claude-code", "cursor"]
+  
+  // Engagement
+  useCount    Int      @default(0)
+  featured    Boolean  @default(false)
+  
+  // Author (for community contributions)
+  authorName  String?
+  authorUrl   String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([slug])
+  @@index([category])
+  @@index([language])
+  @@index([featured])
+}
