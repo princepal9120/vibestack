@@ -362,14 +362,50 @@ export function FeaturedProjectsSection({ projects }: { projects: FeaturedProjec
     );
 }
 
-// Platforms Section
+// Brand Icons
+const CursorIcon = ({ className }: { className?: string }) => (
+    <svg viewBox="0 0 256 256" fill="currentColor" className={className} xmlns="http://www.w3.org/2000/svg">
+        <path d="M80.9602 240.235L22.95 24.225C21.6 20.325 25.5 16.5 29.325 17.85L237.15 89.2501C241.275 90.6751 241.275 96.5251 237.15 97.9501L156.45 125.7L213.3 182.55C217.5 186.75 217.5 193.575 213.3 197.775L197.7 213.375C193.5 217.575 186.675 217.575 182.475 213.375L125.625 156.525L98.5502 240.225C96.9752 244.575 90.8252 244.425 80.9602 240.235Z" />
+    </svg>
+);
+
+const ClaudeIcon = ({ className }: { className?: string }) => (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} xmlns="http://www.w3.org/2000/svg">
+        <path d="M14.625 2.25c-4.493 0-8.914 1.583-12.039 4.312C2.185 6.91 2.015 7.152 2.128 7.394c.112.242.368.375.632.33 2.502-.43 5.483.5 7.73 2.454a8.97 8.97 0 0 1 3.036 5.378c.094.468.56.772 1.036.677.476-.095.78-.56.686-1.028a10.47 10.47 0 0 0-3.543-6.275c-1.87-1.626-4.223-2.585-6.524-2.657 2.768-2.317 6.586-3.648 10.518-3.648 4.697 0 8.922 2.115 11.758 5.462.2.236.55.267.79.068.238-.198.27-.55.07-.786C25.467 3.654 20.669 1.125 15.375 1.125c-.25 0-.5.006-.75.018zM6.92 11.23c-.158.266-.07.608.196.766 2.062 1.22 3.513 3.328 3.829 5.728.04.305.32.518.625.477.306-.04.52-.32.48-.625-.365-2.775-2.043-5.212-4.427-6.623-.267-.158-.609-.07-.767.197zM2.87 15.02c-.282.128-.407.46-.279.742 1.14 2.507 3.31 4.398 5.922 5.163.298.087.607-.086.695-.384.087-.298-.086-.607-.384-.694-2.26-.662-4.137-2.298-5.123-4.467-.128-.282-.46-.407-.741-.278z" />
+    </svg>
+);
+
+const CopilotIcon = ({ className }: { className?: string }) => (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2C6.47 2 2 6.47 2 12c0 5.53 4.47 10 10 10s10-4.47 10-10c0-5.53-4.47-10-10-10zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm4.59-12.42L10 14.17l-2.59-2.58L6 13l4 4 8-8-1.41-1.42z" />
+        {/* Using a generic check/code style icon as placeholder for Copilot if specific path unavailable, but actually let's use the GitHub Octocat simplified for better recognition */}
+        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+    </svg>
+);
+
+const ReplitIcon = ({ className }: { className?: string }) => (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} xmlns="http://www.w3.org/2000/svg">
+        <path d="M2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12ZM7 6H11V10H7V6ZM13 6H17V10H13V6ZM7 14H11V18H7V14Z" />
+    </svg>
+);
+
+const WindsurfIcon = ({ className }: { className?: string }) => (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L2 22h20L12 2zm0 4l6 14H6l6-14z" />
+        {/* Placeholder for Windsurf - simple geometric sail shape */}
+    </svg>
+);
+
 export function PlatformsSection() {
     const platforms = [
-        { id: "cursor", name: "Cursor", icon: "⚡" },
-        { id: "claude-code", name: "Claude Code", icon: "🤖" },
-        { id: "github-copilot", name: "GitHub Copilot", icon: "🐙" },
-        { id: "replit-ai", name: "Replit AI", icon: "💻" },
-        { id: "windsurf", name: "Windsurf", icon: "🏄" },
+        { id: "cursor", name: "Cursor", icon: CursorIcon },
+        { id: "claude-code", name: "Claude Code", icon: ClaudeIcon },
+        { id: "gemini-cli", name: "Gemini CLI", icon: ClaudeIcon }, // Using similar icon
+        { id: "github-copilot", name: "GitHub Copilot", icon: CopilotIcon },
+        { id: "opencode", name: "OpenCode", icon: ReplitIcon }, // Using similar icon
+        { id: "ralph", name: "Ralph", icon: WindsurfIcon }, // Using similar icon
+        { id: "replit-ai", name: "Replit AI", icon: ReplitIcon },
+        { id: "windsurf", name: "Windsurf", icon: WindsurfIcon },
     ];
 
     return (
@@ -399,9 +435,9 @@ export function PlatformsSection() {
                         <motion.div key={platform.id} variants={fadeUp}>
                             <Link
                                 href={`/profiles/${platform.id}`}
-                                className="inline-flex items-center gap-3 rounded-full border border-border bg-card px-6 py-3 text-sm font-medium transition-all hover:bg-primary hover:text-primary-foreground hover:border-primary"
+                                className="inline-flex items-center gap-3 rounded-full border border-border bg-card px-6 py-3 text-sm font-medium transition-all hover:bg-primary hover:text-primary-foreground hover:border-primary group"
                             >
-                                <span className="text-lg">{platform.icon}</span>
+                                <platform.icon className="h-5 w-5 text-muted-foreground group-hover:text-primary-foreground transition-colors" />
                                 {platform.name}
                             </Link>
                         </motion.div>
@@ -451,3 +487,88 @@ export function CTASection() {
         </section>
     );
 }
+
+// Resources & Learning Section
+export function ResourcesSection() {
+    const sections = [
+        {
+            title: "Workflows & Rules",
+            description: "Best practices, hacks, and .cursorrules setup guides",
+            href: "/workflows",
+            icon: "⚡",
+            color: "from-blue-500/20 to-blue-500/5",
+        },
+        {
+            title: "Prompts & Skills",
+            description: "Claude skills and prompt templates for any task",
+            href: "/prompts",
+            icon: "💬",
+            color: "from-purple-500/20 to-purple-500/5",
+        },
+        {
+            title: "Resources",
+            description: "Curated blogs, X posts, and YouTube videos",
+            href: "/resources",
+            icon: "📚",
+            color: "from-green-500/20 to-green-500/5",
+        },
+        {
+            title: "End-to-End Guides",
+            description: "Complete journeys from idea to shipped product",
+            href: "/guides",
+            icon: "🚀",
+            color: "from-orange-500/20 to-orange-500/5",
+        },
+    ];
+
+    return (
+        <section className="border-t border-border py-24">
+            <div className="container">
+                <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
+                    variants={fadeUp}
+                    className="text-center mb-12"
+                >
+                    <h2 className="text-3xl font-bold tracking-tight">Learn & Level Up</h2>
+                    <p className="mt-4 text-muted-foreground">
+                        Everything you need to master AI-assisted coding
+                    </p>
+                </motion.div>
+
+                <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
+                    variants={stagger}
+                    className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"
+                >
+                    {sections.map((section) => (
+                        <motion.div key={section.href} variants={fadeUp}>
+                            <Link
+                                href={section.href}
+                                className={cn(
+                                    "group block rounded-xl border border-border bg-gradient-to-br p-6 transition-all hover:shadow-lg hover:border-primary/30",
+                                    section.color
+                                )}
+                            >
+                                <span className="text-3xl mb-4 block">{section.icon}</span>
+                                <h3 className="font-semibold text-lg group-hover:text-primary transition-colors">
+                                    {section.title}
+                                </h3>
+                                <p className="mt-2 text-sm text-muted-foreground">
+                                    {section.description}
+                                </p>
+                                <div className="mt-4 flex items-center text-sm text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                                    Explore <ArrowRight className="ml-1 h-4 w-4" />
+                                </div>
+                            </Link>
+                        </motion.div>
+                    ))}
+                </motion.div>
+            </div>
+        </section>
+    );
+}
+

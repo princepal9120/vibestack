@@ -153,8 +153,131 @@ model PlatformProfile {
   setupGuide  String   @db.Text // Markdown
   cheatSheet  String[] // Array of key points
   
+  // New fields for enhanced content
+  workflows   Workflow[]
+  prompts     PromptTemplate[]
+  
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   @@index([platformId])
 }
+
+// =============================================================================
+// Workflow Model (Best practices, hacks, rules)
+// =============================================================================
+model Workflow {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String   @db.Text
+  content     String   @db.Text // Markdown - the full workflow guide
+  category    String   // e.g., "setup", "debugging", "refactoring", "testing", "rules"
+  difficulty  String   @default("beginner") // beginner, intermediate, advanced
+  
+  // Platform relation
+  platformId  String
+  platform    PlatformProfile @relation(fields: [platformId], references: [id], onDelete: Cascade)
+  
+  // Engagement
+  viewCount   Int      @default(0)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([platformId])
+  @@index([category])
+  @@index([slug])
+}
+
+// =============================================================================
+// PromptTemplate Model (Claude skills, prompt patterns)
+// =============================================================================
+model PromptTemplate {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String
+  prompt      String   @db.Text // The actual prompt template
+  category    String   // e.g., "coding", "debugging", "documentation", "refactoring"
+  useCase     String?  // Specific use case description
+  
+  // Platform relation
+  platformId  String
+  platform    PlatformProfile @relation(fields: [platformId], references: [id], onDelete: Cascade)
+  
+  // Engagement
+  useCount    Int      @default(0)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([platformId])
+  @@index([category])
+  @@index([slug])
+}
+
+// =============================================================================
+// Resource Model (External content: blogs, articles, X posts, YouTube)
+// =============================================================================
+model Resource {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  url         String   @unique
+  type        String   // "blog", "article", "x_post", "youtube", "tutorial"
+  source      String?  // e.g., "Dev.to", "Medium", "YouTube", "X/Twitter"
+  author      String?  // Original author name
+  thumbnail   String?  // Preview image URL
+  
+  // Categorization
+  platforms   String[] // Related platforms ["cursor", "claude-code"]
+  tags        String[] // e.g., ["beginner", "workflow", "tips"]
+  
+  // Engagement
+  viewCount   Int      @default(0)
+  featured    Boolean  @default(false)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([type])
+  @@index([featured])
+}
+
+// =============================================================================
+// EndToEndGuide Model (Complete journey collections)
+// =============================================================================
+model EndToEndGuide {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String   @db.Text
+  content     String   @db.Text // Full markdown guide
+  
+  // What was built
+  outcome     String?  // e.g., "Built a full-stack SaaS in 2 weeks"
+  
+  // Journey details
+  platforms   String[] // Platforms used
+  techStack   String[] // Tech stack used
+  duration    String?  // e.g., "2 weeks", "1 month"
+  
+  // Author (optional - can be community submitted)
+  authorName  String?
+  authorUrl   String?
+  
+  // Related project
+  projectId   String?  // Link to a Project if applicable
+  
+  // Engagement
+  viewCount   Int      @default(0)
+  featured    Boolean  @default(false)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([slug])
+  @@index([featured])
+}
+
