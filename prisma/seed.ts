@@ -1,7 +1,7 @@
 import { config } from "dotenv";
 config({ path: ".env" });
 
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, ResourceStatus } from "@prisma/client";
 import { PrismaNeon } from "@prisma/adapter-neon";
 
 function createPrismaClient() {
@@ -1237,74 +1237,116 @@ For each issue found:
     // Seed Resources
     const resources = [
         {
-            title: "The Complete Guide to Vibe Coding",
-            description: "An in-depth look at how AI-assisted coding is changing development workflows.",
-            url: "https://example.com/vibe-coding-guide",
-            type: "article",
-            source: "Dev.to",
-            author: "AI Dev Community",
-            platforms: ["cursor", "claude-code"],
-            tags: ["beginner", "workflow", "introduction"],
+            title: "Introducing Claude Code",
+            description: "Official introduction from Anthropic. Claude lets developers delegate substantial engineering tasks to Claude directly from their terminal. Watch Claude explain projects, add features, create tests, and fix errors.",
+            url: "https://www.youtube.com/watch?v=qURuNKz3a94",
+            type: "youtube",
+            source: "YouTube",
+            author: "Anthropic",
+            platforms: ["claude-code"],
+            tags: ["official", "introduction", "beginner"],
+            status: ResourceStatus.APPROVED,
+            featured: true,
+        },
+        {
+            title: "Claude Code Tutorial for Beginners",
+            description: "Learn how to install Claude Code on Mac or Windows, connect it to VS Code, build your first app, structure prompts effectively, and use Plan mode like a senior engineer.",
+            url: "https://www.youtube.com/watch?v=example1",
+            type: "youtube",
+            source: "YouTube",
+            author: "Kevin Stratvert",
+            platforms: ["claude-code"],
+            tags: ["tutorial", "beginner", "setup"],
+            status: ResourceStatus.APPROVED,
+            featured: true,
+        },
+        {
+            title: "Claude Code Tutorial #1 - Introduction & Setup",
+            description: "Learn how to harness Claude Code within your development workflow, including how to install, setup a new project, add context, use MCP servers, and create subagents.",
+            url: "https://www.youtube.com/watch?v=example2",
+            type: "youtube",
+            source: "YouTube",
+            author: "Net Ninja",
+            platforms: ["claude-code"],
+            tags: ["tutorial", "setup", "mcp"],
+            status: ResourceStatus.APPROVED,
+        },
+        {
+            title: "Claude Code for Absolute Beginners: Step-by-Step Tutorial",
+            description: "Bring Claude Code directly to your computer. Complete guide for absolute beginners with step-by-step instructions.",
+            url: "https://www.youtube.com/watch?v=example3",
+            type: "youtube",
+            source: "YouTube",
+            author: "Allie K Miller",
+            platforms: ["claude-code"],
+            tags: ["beginner", "tutorial"],
+            status: ResourceStatus.APPROVED,
+        },
+        {
+            title: "The Only Claude Code Guide You'll Ever Need (Opus 4.5)",
+            description: "Complete beginner's guide to Claude Code. Everything you need to know about using Claude Code with Opus 4.5.",
+            url: "https://www.youtube.com/watch?v=example4",
+            type: "youtube",
+            source: "YouTube",
+            author: "Alex Finn",
+            platforms: ["claude-code"],
+            tags: ["complete-guide", "opus"],
+            status: ResourceStatus.APPROVED,
         },
         {
             title: "Cursor Tips & Tricks - 10x Your Productivity",
             description: "Video tutorial covering advanced Cursor features and keyboard shortcuts.",
-            url: "https://youtube.com/example-cursor-tips",
+            url: "https://www.youtube.com/watch?v=example5",
             type: "youtube",
             source: "YouTube",
             author: "CodeWithAI",
             platforms: ["cursor"],
             tags: ["tips", "productivity", "advanced"],
+            status: ResourceStatus.APPROVED,
+        },
+        {
+            title: "The Complete Guide to Vibe Coding",
+            description: "An in-depth look at how AI-assisted coding is changing development workflows.",
+            url: "https://example.com/vibe-coding-guide",
+            type: "blog",
+            source: "Dev.to",
+            author: "AI Dev Community",
+            platforms: ["cursor", "claude-code"],
+            tags: ["beginner", "workflow", "introduction"],
+            status: ResourceStatus.APPROVED,
         },
         {
             title: "Building a SaaS with Claude Code in 48 Hours",
             description: "Thread documenting the journey of building a complete SaaS using Claude Code.",
             url: "https://x.com/example-saas-thread",
-            type: "x_post",
+            type: "social",
             source: "X/Twitter",
             author: "@vibebuilder",
             platforms: ["claude-code"],
             tags: ["case-study", "saas", "full-stack"],
+            status: ResourceStatus.APPROVED,
         },
         {
-            title: "AI Coding Best Practices for Teams",
-            description: "Blog post on establishing consistent AI coding practices across engineering teams.",
-            url: "https://example.com/team-ai-practices",
+            title: "Windsurf vs Cursor: The Ultimate Comparison",
+            description: "Detailed comparison of Windsurf and Cursor for AI-assisted development.",
+            url: "https://example.com/windsurf-vs-cursor",
             type: "blog",
             source: "Medium",
-            author: "Engineering Lead",
-            platforms: ["cursor", "claude-code", "github-copilot"],
-            tags: ["teams", "best-practices", "enterprise"],
-        },
-        {
-            title: "Ralph: Autonomous AI Coding Explained",
-            description: "Deep dive into using Ralph for autonomous, overnight code generation.",
-            url: "https://example.com/ralph-explained",
-            type: "tutorial",
-            source: "Dev.to",
-            author: "Ralph Contributor",
-            platforms: ["ralph", "claude-code"],
-            tags: ["advanced", "automation", "autonomous"],
+            author: "AI Tools Review",
+            platforms: ["windsurf", "cursor"],
+            tags: ["comparison", "review"],
+            status: ResourceStatus.APPROVED,
         },
         {
             title: "Getting Started with OpenCode",
             description: "Complete tutorial on setting up and using OpenCode with multiple AI providers.",
-            url: "https://youtube.com/opencode-getting-started",
+            url: "https://www.youtube.com/watch?v=example6",
             type: "youtube",
             source: "YouTube",
             author: "Terminal Dev",
             platforms: ["opencode"],
             tags: ["beginner", "setup", "multi-provider"],
-        },
-        {
-            title: "Gemini CLI vs Claude Code: Which to Choose?",
-            description: "Comparison of Google's Gemini CLI and Anthropic's Claude Code for different use cases.",
-            url: "https://example.com/gemini-vs-claude",
-            type: "article",
-            source: "Dev.to",
-            author: "AI Tools Review",
-            platforms: ["gemini-cli", "claude-code"],
-            tags: ["comparison", "decision-guide"],
+            status: ResourceStatus.APPROVED,
         },
     ];
 
@@ -1923,6 +1965,306 @@ React Testing:
         console.log(`  ✓ Created Sub-Agent: ${agent.name}`);
     }
 
+    // Seed Skills (Agent Skills - modular capabilities)
+    console.log("\n📚 Seeding Skills...");
+
+    const skills = [
+        {
+            name: "PowerPoint Creator",
+            slug: "powerpoint-creator",
+            tagline: "Create and edit professional presentations",
+            description: "Generate polished PowerPoint presentations with proper formatting, charts, and layouts. Supports creating slides, adding content, and exporting to .pptx format.",
+            instructions: `You are an expert PowerPoint creator. When asked to create presentations:
+
+1. Structure slides logically with clear headings
+2. Use bullet points for key information
+3. Include speaker notes where appropriate
+4. Suggest relevant images or charts
+5. Follow professional presentation best practices
+6. Keep text concise and readable
+7. Use consistent styling throughout
+
+Output Format:
+- Provide slide content in structured format
+- Include title, body, and notes for each slide
+- Suggest visual elements to enhance impact`,
+            category: "document",
+            platforms: ["claude-code", "cursor", "gemini-cli", "opencode"],
+            examples: ["Create a quarterly report presentation", "Design a product launch deck", "Make a training presentation"],
+            triggers: ["create presentation", "make powerpoint", "pptx", "slides"],
+            provider: "official",
+            featured: true,
+            useCount: 4520,
+        },
+        {
+            name: "Excel Data Analyst",
+            slug: "excel-data-analyst",
+            tagline: "Create spreadsheets and analyze data with charts",
+            description: "Build Excel spreadsheets with formulas, pivot tables, and visualizations. Analyze data sets, generate reports, and create interactive dashboards.",
+            instructions: `You are an expert Excel/spreadsheet analyst. When working with data:
+
+1. Structure data in proper tabular format
+2. Use appropriate formulas (SUM, VLOOKUP, INDEX/MATCH)
+3. Create pivot tables for summarization
+4. Design clear and informative charts
+5. Apply conditional formatting for insights
+6. Validate data inputs where appropriate
+7. Document complex formulas with comments
+
+Best Practices:
+- Use named ranges for readability
+- Separate raw data from calculations
+- Include data validation rules
+- Design for scalability`,
+            category: "data",
+            platforms: ["claude-code", "cursor", "gemini-cli", "opencode"],
+            examples: ["Analyze sales data", "Create financial model", "Build tracking spreadsheet"],
+            triggers: ["excel", "spreadsheet", "data analysis", "xlsx", "pivot table"],
+            provider: "official",
+            featured: true,
+            useCount: 3890,
+        },
+        {
+            name: "PDF Generator",
+            slug: "pdf-generator",
+            tagline: "Generate formatted PDF documents and reports",
+            description: "Create professional PDF documents with proper formatting, headers, tables, and visual elements. Ideal for reports, documentation, and formal documents.",
+            instructions: `You are an expert PDF document creator. When generating PDFs:
+
+1. Use proper document structure with headers
+2. Apply consistent typography and spacing
+3. Include tables for structured data
+4. Add page numbers and headers/footers
+5. Use appropriate margins and layout
+6. Include a table of contents for long documents
+7. Add visual hierarchy with headings
+
+Document Standards:
+- Use professional fonts (serif for body, sans-serif for headings)
+- Maintain proper line height (1.5x)
+- Include proper page breaks
+- Add metadata (title, author, date)`,
+            category: "document",
+            platforms: ["claude-code", "cursor", "gemini-cli", "opencode", "copilot"],
+            examples: ["Generate a report", "Create documentation", "Make a contract PDF"],
+            triggers: ["pdf", "generate document", "create report", "export pdf"],
+            provider: "official",
+            featured: false,
+            useCount: 2150,
+        },
+        {
+            name: "Code Reviewer",
+            slug: "code-reviewer",
+            tagline: "Thorough code review with actionable feedback",
+            description: "Perform comprehensive code reviews focusing on bugs, security issues, performance, and best practices. Provides specific suggestions with code examples.",
+            instructions: `You are a senior code reviewer. When reviewing code:
+
+## Review Checklist
+1. **Correctness**: Does the code work as intended?
+2. **Security**: Are there any vulnerabilities?
+3. **Performance**: Are there optimization opportunities?
+4. **Readability**: Is the code clear and maintainable?
+5. **Testing**: Is the code properly tested?
+6. **DRY**: Is there unnecessary duplication?
+
+## Feedback Format
+- Provide specific line-by-line feedback
+- Categorize issues: Bug, Security, Performance, Style
+- Include severity: Critical, High, Medium, Low
+- Suggest fixes with code examples
+
+## Tone
+- Be constructive and educational
+- Explain the "why" behind suggestions
+- Acknowledge good patterns`,
+            category: "coding",
+            platforms: ["claude-code", "cursor", "gemini-cli", "opencode", "copilot", "windsurf"],
+            examples: ["Review this pull request", "Check for security issues", "Audit performance"],
+            triggers: ["review code", "code review", "check code", "audit"],
+            provider: "community",
+            featured: true,
+            useCount: 5670,
+        },
+        {
+            name: "Git Workflow Expert",
+            slug: "git-workflow",
+            tagline: "Advanced Git operations and workflow automation",
+            description: "Master Git commands, branching strategies, conflict resolution, and team collaboration workflows.",
+            instructions: `You are a Git and version control expert. When helping with Git:
+
+## Branching Strategy
+- main/master: Production-ready code
+- develop: Integration branch
+- feature/*: New features
+- hotfix/*: Production fixes
+- release/*: Release preparation
+
+## Best Practices
+- Write meaningful commit messages (conventional commits)
+- Keep commits atomic and focused
+- Rebase feature branches before merging
+- Use pull requests for code review
+- Tag releases appropriately
+
+## Commands Reference
+- Interactive rebase: git rebase -i HEAD~n
+- Cherry-pick: git cherry-pick <commit>
+- Bisect: git bisect start/good/bad
+- Reflog: git reflog for recovery
+
+## Conflict Resolution
+- Understand both changes before resolving
+- Test after resolution
+- Communicate with original authors`,
+            category: "workflow",
+            platforms: ["claude-code", "cursor", "gemini-cli", "opencode", "copilot"],
+            examples: ["Resolve merge conflict", "Set up branching strategy", "Recover lost commits"],
+            triggers: ["git", "merge", "branch", "commit", "rebase"],
+            provider: "community",
+            featured: false,
+            useCount: 3420,
+        },
+        {
+            name: "API Designer",
+            slug: "api-designer",
+            tagline: "Design RESTful APIs following best practices",
+            description: "Create well-structured APIs with proper endpoints, authentication, error handling, and documentation using OpenAPI/Swagger specifications.",
+            instructions: `You are an API design expert. When designing APIs:
+
+## RESTful Conventions
+- Use nouns for resources: /users, /posts
+- HTTP methods: GET, POST, PUT, PATCH, DELETE
+- Proper status codes: 200, 201, 400, 401, 404, 500
+- Consistent naming: camelCase or snake_case
+
+## URL Design
+- GET /resources - List all
+- GET /resources/:id - Get one
+- POST /resources - Create
+- PUT /resources/:id - Replace
+- PATCH /resources/:id - Update
+- DELETE /resources/:id - Delete
+
+## Authentication
+- JWT for stateless auth
+- OAuth 2.0 for third-party access
+- API keys for service-to-service
+
+## Documentation
+- OpenAPI 3.0 specification
+- Include examples for all endpoints
+- Document error responses
+- Version your API (v1, v2)`,
+            category: "coding",
+            platforms: ["claude-code", "cursor", "gemini-cli", "opencode"],
+            examples: ["Design a user API", "Create OpenAPI spec", "Document endpoints"],
+            triggers: ["api design", "rest api", "openapi", "swagger", "endpoints"],
+            provider: "community",
+            featured: false,
+            useCount: 2890,
+        },
+        {
+            name: "Database Architect",
+            slug: "database-architect",
+            tagline: "Design efficient database schemas and queries",
+            description: "Create optimized database schemas, write efficient queries, and implement proper indexing strategies for both SQL and NoSQL databases.",
+            instructions: `You are a database architecture expert. When designing databases:
+
+## Schema Design
+- Normalize to 3NF for OLTP systems
+- Denormalize strategically for read performance
+- Use appropriate data types
+- Define proper relationships (1:1, 1:N, N:N)
+
+## Indexing Strategy
+- Index columns used in WHERE, JOIN, ORDER BY
+- Consider composite indexes for multi-column queries
+- Avoid over-indexing (slows writes)
+- Use covering indexes for frequent queries
+
+## Query Optimization
+- Use EXPLAIN/ANALYZE to understand query plans
+- Avoid SELECT * in production
+- Limit result sets with pagination
+- Use prepared statements
+
+## SQL Best Practices
+- Use transactions for data consistency
+- Implement proper constraints (FK, UNIQUE, CHECK)
+- Add created_at, updated_at timestamps
+- Use soft deletes for audit trails`,
+            category: "data",
+            platforms: ["claude-code", "cursor", "gemini-cli", "opencode", "copilot"],
+            examples: ["Design user schema", "Optimize slow query", "Create indexes"],
+            triggers: ["database", "schema", "sql", "query optimization", "indexes"],
+            provider: "community",
+            featured: true,
+            useCount: 4120,
+        },
+        {
+            name: "CI/CD Pipeline Builder",
+            slug: "cicd-pipeline",
+            tagline: "Automate builds, tests, and deployments",
+            description: "Create robust CI/CD pipelines using GitHub Actions, GitLab CI, or other platforms. Includes testing, linting, security scanning, and deployment stages.",
+            instructions: `You are a CI/CD expert. When creating pipelines:
+
+## Pipeline Stages
+1. **Build**: Compile/bundle application
+2. **Lint**: Check code style
+3. **Test**: Run unit/integration tests
+4. **Security**: Scan for vulnerabilities
+5. **Deploy**: Push to environments
+
+## GitHub Actions Best Practices
+- Use matrix builds for multiple versions
+- Cache dependencies for speed
+- Use secrets for credentials
+- Set up proper branch protection
+
+## Deployment Strategy
+- Staging environment for testing
+- Blue-green or canary deployments
+- Rollback procedures
+- Health checks post-deploy
+
+## Pipeline Template
+\`\`\`yaml
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+\`\`\``,
+            category: "automation",
+            platforms: ["claude-code", "cursor", "gemini-cli", "opencode"],
+            examples: ["Create GitHub Actions workflow", "Set up deployment pipeline", "Add test automation"],
+            triggers: ["ci/cd", "github actions", "pipeline", "deploy", "automation"],
+            provider: "community",
+            featured: false,
+            useCount: 2340,
+        },
+    ];
+
+    for (const skill of skills) {
+        await prisma.skill.upsert({
+            where: { slug: skill.slug },
+            update: skill,
+            create: skill,
+        });
+        console.log(`  ✓ Created Skill: ${skill.name}`);
+    }
+
     console.log("\n✅ Comprehensive seeding complete!");
 }
 
@@ -1934,3 +2276,4 @@ main()
     .finally(async () => {
         await prisma.$disconnect();
     });
+

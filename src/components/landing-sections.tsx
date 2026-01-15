@@ -104,7 +104,7 @@ export function HeroSection() {
                 className="max-w-4xl text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl"
             >
                 The amazing things people are building with{" "}
-                <span className="gradient-text">AI</span>
+                <span className="text-primary">AI</span>
             </motion.h1>
 
             {/* Subheading */}

@@ -220,6 +220,12 @@ model PromptTemplate {
 // =============================================================================
 // Resource Model (External content: blogs, articles, X posts, YouTube)
 // =============================================================================
+enum ResourceStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model Resource {
   id          String   @id @default(cuid())
   title       String
@@ -229,6 +235,9 @@ model Resource {
   source      String?  // e.g., "Dev.to", "Medium", "YouTube", "X/Twitter"
   author      String?  // Original author name
   thumbnail   String?  // Preview image URL
+  
+  // Moderation
+  status      ResourceStatus @default(PENDING)
   
   // Categorization
   platforms   String[] // Related platforms ["cursor", "claude-code"]
@@ -242,6 +251,7 @@ model Resource {
   updatedAt   DateTime @updatedAt
 
   @@index([type])
+  @@index([status])
   @@index([featured])
 }
 
@@ -358,3 +368,50 @@ model SubAgent {
   @@index([language])
   @@index([featured])
 }
+
+// =============================================================================
+// Skill Model (Agent Skills - modular capabilities like Anthropic's Skills)
+// =============================================================================
+model Skill {
+  id           String   @id @default(cuid())
+  name         String
+  slug         String   @unique
+  tagline      String   // Short description
+  description  String   @db.Text // Full description with markdown
+  
+  // The actual skill content
+  instructions String   @db.Text // The instructions/prompt for the skill
+  
+  // Categorization
+  category     String   // e.g., "document", "coding", "data", "workflow", "automation"
+  
+  // Compatibility
+  platforms    String[] // ["claude-code", "cursor", "gemini-cli", "opencode", "copilot"]
+  
+  // Usage & Examples
+  examples     String[] // Example use cases
+  triggers     String[] // Keywords/scenarios that trigger this skill
+  
+  // Author info
+  authorName   String?
+  authorUrl    String?
+  repoUrl      String?
+  
+  // Visual
+  iconUrl      String?
+  
+  // Provider
+  provider     String   @default("community") // "official", "community", "verified"
+  
+  // Engagement
+  useCount     Int      @default(0)
+  featured     Boolean  @default(false)
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([slug])
+  @@index([category])
+  @@index([featured])
+}
+

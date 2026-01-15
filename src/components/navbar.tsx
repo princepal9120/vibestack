@@ -12,8 +12,11 @@ import {
     MessageSquare,
     Zap,
     Users,
-    BookOpen,
     Server,
+    Plus,
+    Rocket,
+    FileText,
+    Wand2,
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -25,6 +28,7 @@ const navItems = [
 
 // Collections dropdown items
 const collectionsItems = [
+    { href: "/collections/skills", label: "Skills", icon: Wand2, description: "Modular AI capabilities" },
     { href: "/collections/prompts", label: "Prompts", icon: MessageSquare, description: "Copy-paste ready prompts" },
     { href: "/collections/subagents", label: "Sub-Agents", icon: Users, description: "Role-specific AI agents" },
     { href: "/collections/workflows", label: "Workflows", icon: Zap, description: "Best practices & guides" },
@@ -159,18 +163,45 @@ export function Navbar() {
 
                 {/* Auth & Actions */}
                 <div className="flex items-center gap-3">
-                    <SignedIn>
-                        <Link
-                            href="/projects/new"
-                            className="hidden sm:inline-flex h-9 items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90"
+                    {/* Submit Dropdown */}
+                    <div className="relative hidden sm:block group">
+                        <button
+                            className="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90"
                         >
-                            Submit Project
-                        </Link>
+                            <Plus className="h-4 w-4" />
+                            Submit
+                            <ChevronDown className="h-3 w-3" />
+                        </button>
+                        <div className="invisible group-hover:visible opacity-0 group-hover:opacity-100 absolute top-full right-0 mt-2 w-56 rounded-xl border border-border bg-card p-2 shadow-xl shadow-black/10 transition-all duration-150">
+                            <Link
+                                href="/submit/project"
+                                className="flex items-start gap-3 rounded-lg p-3 transition-colors hover:bg-accent"
+                            >
+                                <Rocket className="h-5 w-5 text-primary mt-0.5" />
+                                <div>
+                                    <div className="text-sm font-medium text-foreground">Submit Project</div>
+                                    <div className="text-xs text-muted-foreground">Showcase your AI-built app</div>
+                                </div>
+                            </Link>
+                            <Link
+                                href="/submit/resource"
+                                className="flex items-start gap-3 rounded-lg p-3 transition-colors hover:bg-accent"
+                            >
+                                <FileText className="h-5 w-5 text-emerald-500 mt-0.5" />
+                                <div>
+                                    <div className="text-sm font-medium text-foreground">Submit Resource</div>
+                                    <div className="text-xs text-muted-foreground">Share a blog, video, or tutorial</div>
+                                </div>
+                            </Link>
+                        </div>
+                    </div>
+
+                    <SignedIn>
                         <UserButton afterSignOutUrl="/" />
                     </SignedIn>
                     <SignedOut>
                         <SignInButton mode="modal">
-                            <button className="inline-flex h-9 items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90">
+                            <button className="inline-flex h-9 items-center justify-center rounded-lg border border-border px-4 text-sm font-medium hover:bg-accent transition-colors">
                                 Sign In
                             </button>
                         </SignInButton>
@@ -257,15 +288,25 @@ export function Navbar() {
                                 </Link>
                             ))}
 
-                            <SignedIn>
+                            {/* Submit options for mobile */}
+                            <div className="pt-3 mt-3 border-t border-border space-y-1">
                                 <Link
-                                    href="/projects/new"
+                                    href="/submit/project"
                                     onClick={() => setMobileMenuOpen(false)}
-                                    className="block py-3 px-3 rounded-lg text-sm font-medium text-primary bg-primary/5"
+                                    className="flex items-center gap-3 py-3 px-3 rounded-lg text-sm font-medium bg-primary/5 text-primary"
                                 >
+                                    <Rocket className="h-4 w-4" />
                                     Submit Project
                                 </Link>
-                            </SignedIn>
+                                <Link
+                                    href="/submit/resource"
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    className="flex items-center gap-3 py-3 px-3 rounded-lg text-sm font-medium text-muted-foreground hover:bg-accent"
+                                >
+                                    <FileText className="h-4 w-4" />
+                                    Submit Resource
+                                </Link>
+                            </div>
                         </div>
                     </motion.div>
                 )}
