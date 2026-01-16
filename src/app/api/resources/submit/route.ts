@@ -3,13 +3,13 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
 const submitResourceSchema = z.object({
-    title: z.string().min(5, "Title must be at least 5 characters"),
+    title: z.string().min(3, "Title must be at least 3 characters"),
     url: z.string().url("Must be a valid URL"),
-    description: z.string().min(20, "Description must be at least 20 characters"),
+    description: z.string().optional(),
     type: z.enum(["blog", "tutorial", "youtube", "social"]),
-    platforms: z.array(z.string()).optional(),
     authorName: z.string().optional(),
-    authorEmail: z.string().email().optional().or(z.literal("")),
+    authorHandle: z.string().optional(),
+    thumbnailUrl: z.string().url().optional().or(z.literal("")),
 });
 
 export async function POST(request: NextRequest) {
@@ -34,10 +34,10 @@ export async function POST(request: NextRequest) {
             data: {
                 title: validated.title,
                 url: validated.url,
-                description: validated.description,
+                description: validated.description || "",
                 type: validated.type,
-                platforms: validated.platforms || [],
-                author: validated.authorName || null,
+                thumbnailUrl: validated.thumbnailUrl || null,
+                author: validated.authorName || validated.authorHandle || null,
                 source: validated.authorName || "Community",
                 // Status defaults to PENDING in schema
             },
