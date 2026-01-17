@@ -21,15 +21,17 @@ import { formatDistanceToNow } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 
 interface ProjectPageProps {
-    params: {
+    params: Promise<{
         id: string;
-    };
+    }>;
 }
 
 // Generate Dynamic Metadata
 export async function generateMetadata({ params }: ProjectPageProps): Promise<Metadata> {
+    const { id } = await params;
+
     const project = await prisma.project.findUnique({
-        where: { id: params.id },
+        where: { id },
         include: { author: true },
     });
 

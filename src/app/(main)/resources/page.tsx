@@ -111,7 +111,7 @@ async function ResourcesList({ searchParams }: { searchParams: ResourcesPageProp
                     <Link href="/submit/resource" className="underline hover:text-foreground">
                         submit a resource
                     </Link>
-                </p>
+                </p>No resources found
             </div>
         );
     }

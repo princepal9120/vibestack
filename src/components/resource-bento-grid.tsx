@@ -53,6 +53,57 @@ function ResourceCard({
     const badge = getBadge();
 
     if (size === "featured") {
+        // For social posts without thumbnails, show content-focused layout
+        if (isSocial && !thumbnail) {
+            return (
+                <motion.a
+                    href={resource.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.05 }}
+                    className="group relative col-span-2 row-span-2 overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-800 p-8 flex flex-col"
+                >
+                    {/* Header */}
+                    <div className="flex items-start justify-between mb-6">
+                        <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
+                                <XIcon className="h-6 w-6 text-white" />
+                            </div>
+                            <div>
+                                <p className="font-semibold text-white">{resource.author || "Anonymous"}</p>
+                                {resource.authorHandle && (
+                                    <p className="text-sm text-white/60">@{resource.authorHandle.replace("@", "")}</p>
+                                )}
+                            </div>
+                        </div>
+                        <span className="px-3 py-1.5 rounded-full bg-orange-500 text-white text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+                            <Star className="h-3 w-3 fill-current" />
+                            Featured
+                        </span>
+                    </div>
+
+                    {/* Tweet Content */}
+                    <div className="flex-1 flex items-center">
+                        <p className="text-2xl md:text-3xl font-medium text-white leading-relaxed line-clamp-6">
+                            "{resource.title}"
+                        </p>
+                    </div>
+
+                    {/* Footer */}
+                    <div className="mt-6 flex items-center justify-between">
+                        <span className="text-sm text-white/50 flex items-center gap-2">
+                            <XIcon className="h-4 w-4" />
+                            View on X
+                        </span>
+                        <ArrowUpRight className="h-5 w-5 text-white/50 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+                    </div>
+                </motion.a>
+            );
+        }
+
         return (
             <motion.a
                 href={resource.url}

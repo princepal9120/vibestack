@@ -59,8 +59,7 @@ export default function SubmitProjectPage() {
         repoUrl: "",
         platforms: [] as string[],
         techStack: [] as string[],
-        thumbnail: null as File | null,
-        thumbnailPreview: "",
+        screenshotUrl: "",  // Changed to URL-based
     });
 
     // Redirect to sign-in if not authenticated
@@ -87,14 +86,14 @@ export default function SubmitProjectPage() {
         );
     }
 
-    const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            setFormData({
-                ...formData,
-                thumbnail: file,
-                thumbnailPreview: URL.createObjectURL(file),
-            });
+    // Screenshot URL validation
+    const isValidImageUrl = (url: string) => {
+        if (!url) return true; // Empty is valid (optional)
+        try {
+            new URL(url);
+            return /\.(jpg|jpeg|png|gif|webp)$/i.test(url) || url.includes('imgur') || url.includes('cloudinary') || url.includes('githubusercontent');
+        } catch {
+            return false;
         }
     };
 
@@ -115,7 +114,8 @@ export default function SubmitProjectPage() {
                     githubUrl: formData.repoUrl || null,
                     platforms: formData.platforms.map(p => p.toLowerCase().replace(/\s+/g, "-")),
                     techStack: formData.techStack,
-                    category: "web-app", // Default category
+                    category: "web-app",
+                    screenshots: formData.screenshotUrl ? [formData.screenshotUrl] : [],
                 }),
             });
 
@@ -179,8 +179,7 @@ export default function SubmitProjectPage() {
                                     repoUrl: "",
                                     platforms: [],
                                     techStack: [],
-                                    thumbnail: null,
-                                    thumbnailPreview: "",
+                                    screenshotUrl: "",
                                 });
                             }}
                             className="inline-flex items-center justify-center gap-2 rounded-xl border border-border px-6 py-4 text-base font-medium hover:bg-accent"
@@ -403,52 +402,48 @@ export default function SubmitProjectPage() {
                             ← Back to details
                         </button>
 
-                        {/* Thumbnail Upload */}
+                        {/* Screenshot URL */}
                         <div className="space-y-3">
                             <label className="text-sm font-medium">
-                                Project Thumbnail
+                                Screenshot URL
                             </label>
                             <p className="text-sm text-muted-foreground">
-                                Upload a screenshot or cover image (1200x630 recommended)
+                                Paste a link to your project screenshot (Imgur, Cloudinary, GitHub, etc.)
                             </p>
 
-                            {formData.thumbnailPreview ? (
+                            <div className="relative">
+                                <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                                <input
+                                    type="url"
+                                    placeholder="https://imgur.com/your-image.png"
+                                    value={formData.screenshotUrl}
+                                    onChange={(e) => setFormData({ ...formData, screenshotUrl: e.target.value })}
+                                    className="w-full rounded-xl border border-border bg-background pl-10 pr-4 py-3 text-sm placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                />
+                            </div>
+
+                            {formData.screenshotUrl && isValidImageUrl(formData.screenshotUrl) && (
                                 <div className="relative rounded-2xl overflow-hidden border border-border">
                                     <Image
-                                        src={formData.thumbnailPreview}
-                                        alt="Thumbnail preview"
+                                        src={formData.screenshotUrl}
+                                        alt="Screenshot preview"
                                         width={1200}
                                         height={630}
                                         className="w-full aspect-video object-cover"
+                                        unoptimized
                                     />
                                     <button
-                                        onClick={() => setFormData({
-                                            ...formData,
-                                            thumbnail: null,
-                                            thumbnailPreview: "",
-                                        })}
+                                        onClick={() => setFormData({ ...formData, screenshotUrl: "" })}
                                         className="absolute top-3 right-3 p-2 rounded-lg bg-background/80 backdrop-blur hover:bg-background"
                                     >
                                         <X className="h-4 w-4" />
                                     </button>
                                 </div>
-                            ) : (
-                                <label className="flex flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed border-border p-12 cursor-pointer hover:border-primary/50 transition-colors">
-                                    <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center">
-                                        <ImageIcon className="h-8 w-8 text-muted-foreground" />
-                                    </div>
-                                    <div className="text-center">
-                                        <p className="font-medium">Click to upload</p>
-                                        <p className="text-sm text-muted-foreground">PNG, JPG up to 5MB</p>
-                                    </div>
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={handleThumbnailChange}
-                                        className="hidden"
-                                    />
-                                </label>
                             )}
+
+                            <p className="text-xs text-muted-foreground">
+                                💡 Tip: Upload your image to <a href="https://imgur.com/upload" target="_blank" rel="noopener noreferrer" className="underline">Imgur</a> or take a screenshot, then paste the direct image link here.
+                            </p>
                         </div>
 
                         <button
@@ -473,13 +468,14 @@ export default function SubmitProjectPage() {
 
                         <div className="rounded-2xl border border-border overflow-hidden">
                             {/* Preview Card */}
-                            {formData.thumbnailPreview && (
+                            {formData.screenshotUrl && isValidImageUrl(formData.screenshotUrl) && (
                                 <Image
-                                    src={formData.thumbnailPreview}
+                                    src={formData.screenshotUrl}
                                     alt="Thumbnail"
                                     width={1200}
                                     height={630}
                                     className="w-full aspect-video object-cover"
+                                    unoptimized
                                 />
                             )}
                             <div className="p-6 space-y-4">
@@ -522,6 +518,6 @@ export default function SubmitProjectPage() {
                     </div>
                 )}
             </div>
-        </div>
+        </div >
     );
 }
