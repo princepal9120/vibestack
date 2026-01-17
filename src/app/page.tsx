@@ -5,10 +5,10 @@ import {
   FeaturesSection,
   FeaturedProjectsSection,
   PlatformsSection,
-  ResourcesSection,
   CTASection,
-  TestimonialsSection,
+  TestimonialsSection, // Keeping for reference or backup
 } from "@/components/landing-sections";
+import CommunityVibesSection from "@/components/community-vibes-section";
 import { prisma } from "@/lib/prisma";
 
 async function getFeaturedProjects() {
@@ -68,8 +68,7 @@ export default async function HomePage() {
         <FeaturedProjectsSection projects={featuredProjects} />
         <FeaturesSection />
         <PlatformsSection />
-        <TestimonialsSection />
-        <ResourcesSection resources={featuredResources} />
+        <CommunityVibesSection resources={featuredResources} />
         <CTASection />
       </main>
       <Footer />
@@ -87,7 +86,7 @@ async function getFeaturedResources() {
       orderBy: {
         viewCount: "desc",
       },
-      take: 20,
+      take: 50,
     });
 
     // Fallback if no featured resources
@@ -99,7 +98,7 @@ async function getFeaturedResources() {
         orderBy: {
           createdAt: "desc"
         },
-        take: 20,
+        take: 50,
       });
     }
 

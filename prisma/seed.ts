@@ -24,8 +24,8 @@ async function main() {
     await prisma.comment.deleteMany();
     await prisma.upvote.deleteMany();
     await prisma.project.deleteMany();
-    await prisma.resource.deleteMany();
-    console.log("Removed all projects and resources.");
+    // await prisma.resource.deleteMany(); // Preserving resources to avoid re-fetching
+    console.log("Removed all projects.");
 
     // Seed Platform Profiles
     const platforms = [
@@ -2290,7 +2290,18 @@ jobs:
         "https://x.com/vincenzolandino/status/2012532144178966852",
         "https://x.com/naveenmiitk/status/2012531983382143473",
         "https://x.com/MinaGawargious/status/2012531930655301671",
-        "https://x.com/MosesSenpai/status/2012531890440274287"
+        "https://x.com/MosesSenpai/status/2012531890440274287",
+        // User Requested Resources (Claude Code) -> MOVED TO ARTICLES
+        //"https://x.com/bcherny/status/2007179832300581177",
+        //"https://x.com/alliekmiller/status/2012197383673729037",
+        //"https://x.com/petergyang/status/1963248146336866757",
+        "https://x.com/omarsar0/status/1987167737639325886", // Keep regular tweets
+        // User Requested Resources (Cursor IDE) -> MOVED TO ARTICLES
+        //"https://x.com/csjcode/status/1897421080459141467",
+        //"https://x.com/leerob/status/1970296525269147949",
+        //"https://x.com/PauloGaspar7/status/1903283826459029787",
+        // User Requested Resources (AI Agents)
+        "https://x.com/levie/status/1953225396822163885"
     ];
 
     console.log("Seeding Tweets...");
@@ -2510,6 +2521,202 @@ jobs:
             }
         });
         console.log(`  ✓ Seeded video: ${video.title.substring(0, 30)}...`);
+    }
+
+    // Seed Articles
+    const articles = [
+        {
+            title: "How I Use Every Claude Code Feature",
+            url: "https://blog.sshh.io/p/how-i-use-every-claude-code-feature",
+            description: "A deep dive into maximizing productivity with Claude Code, covering advanced features and personal workflows.",
+            type: "article",
+            source: "blog.sshh.io",
+            author: "Shrivu Shankar",
+            thumbnail: "https://blog.sshh.io/og-image.png", // Placeholder/Generic if not available
+            status: "APPROVED"
+        },
+        {
+            title: "Antigravity vs Cursor vs Claude Code comparison",
+            url: "https://thinkpeak.ai/antigravity-vs-cursor-vs-claude-code-2026/",
+            description: "A comprehensive comparison of the top AI coding tools for 2026.",
+            type: "article",
+            source: "thinkpeak.ai",
+            author: "ThinkPeak",
+            thumbnail: "https://thinkpeak.ai/images/og.png",
+            status: "APPROVED"
+        },
+        {
+            title: "How to Safely Run AI Agents Like Cursor and Claude",
+            url: "https://codewithandrea.com/articles/run-ai-agents-inside-devcontainer/",
+            description: "Security best practices for running autonomous AI agents within dev containers.",
+            type: "article",
+            source: "codewithandrea.com",
+            author: "Andrea",
+            thumbnail: "https://codewithandrea.com/img/og.png",
+            status: "APPROVED"
+        }
+    ];
+
+    console.log("Seeding Articles...");
+    for (const article of articles) {
+        await prisma.resource.upsert({
+            where: { url: article.url },
+            update: {
+                ...article,
+                status: ResourceStatus.APPROVED,
+                type: "article" // Explicitly ensure type is set to article/blog
+            },
+            create: {
+                ...article,
+                status: ResourceStatus.APPROVED,
+                viewCount: Math.floor(Math.random() * 500)
+            }
+        });
+        console.log(`  ✓ Seeded article: ${article.title.substring(0, 30)}...`);
+    }
+
+    // Seed X (Twitter) Articles - Force Type "article"
+    const tweetArticles = [
+        "https://x.com/bcherny/status/2007179832300581177",
+        "https://x.com/alliekmiller/status/2012197383673729037",
+        "https://x.com/petergyang/status/1963248146336866757",
+        "https://x.com/csjcode/status/1897421080459141467",
+        "https://x.com/leerob/status/1970296525269147949",
+        "https://x.com/PauloGaspar7/status/1903283826459029787"
+    ];
+
+    console.log("Seeding X Articles as Blogs...");
+    for (const url of tweetArticles) {
+        try {
+            const id = url.split("/").pop();
+            if (!id) continue;
+            // We use the same getTweet function
+            const tweet = await getTweet(id).catch(() => null);
+            if (!tweet) continue;
+
+            await prisma.resource.upsert({
+                where: { url: url },
+                update: {
+                    type: "article", // Force type to article
+                    title: `Article by ${tweet.user.name}`,
+                    description: tweet.text,
+                    status: "APPROVED"
+                },
+                create: {
+                    title: `Article by ${tweet.user.name}`,
+                    description: tweet.text,
+                    url: url,
+                    type: "article", // Force type to article
+                    source: `@${tweet.user.screen_name}`,
+                    author: tweet.user.name,
+                    thumbnail: tweet.user.profile_image_url_https,
+                    status: "APPROVED",
+                    viewCount: Math.floor(Math.random() * 1000),
+                }
+            });
+            console.log(`  ✓ Updated X Post to Article: ${id}`);
+        } catch (error) {
+            console.error(`  x Failed to update X Article ${url}:`, error);
+        }
+    }
+
+    // Ensure System User exists for Projects
+    const systemUser = await prisma.user.upsert({
+        where: { username: "vibestack" },
+        update: {},
+        create: {
+            clerkId: "user_vibestack_system",
+            email: "system@vibestack.ai",
+            username: "vibestack",
+            avatar: "https://github.com/shadcn.png",
+            bio: "Official Vibe Stack System Account",
+        },
+    });
+
+    console.log(`  ✓ System user ready: ${systemUser.username}`);
+
+    // Seed New Projects (User Provided)
+    const projects = [
+        {
+            title: "MyGitFolio - GitHub Portfolio Generator",
+            description: "AI-powered tool that transforms your GitHub profile into a sleek, shareable portfolio page with repository stats, languages, and project highlights—no configuration needed.",
+            longDescription: "Read more: https://www.reddit.com/r/vibecoding/comments/1q42pbl/i_vibe_coded_a_page_that_turns_your_github_into_a/",
+            keyInsights: `• **Claude/Codex-driven entire build**: Developer used VS Code with Claude—zero handwritten code
+• **Rapid MVP iteration**: Deployed to production within days; user feedback drove UX refinements (e.g., color customization)
+• **Clean abstraction**: Focuses only on GitHub data visualization instead of reinventing portfolio builders
+• **Performance optimization**: Backend reformats data vs. client-side rendering; identified API latency issues early via community testing
+• **Production feedback loop**: 121+ Reddit comments revealed real-world concerns (loading delays, iOS compatibility); developer iterated based on user reports
+• **Zero friction onboarding**: Enter GitHub username → instant portfolio; no auth, no config, no friction`,
+            category: "web-app",
+            platforms: ["claude-code"],
+            techStack: ["react", "next.js", "typescript", "javascript", "tailwind", "node.js", "vercel"],
+            liveUrl: "https://mygitfolio.com",
+            featured: true,
+            authorId: systemUser.id,
+            screenshots: ["https://picsum.photos/800/450?random=1"]
+        },
+        {
+            title: "Ultimate Vibe Coding Guide & Resources",
+            description: "Comprehensive open-source guide documenting AI-driven game and app development using Cursor and Claude. Built on 4000+ Cursor prompts from a viral game project.",
+            longDescription: "Read more: https://www.reddit.com/r/vibecoding/comments/1o05oi8/i_updated_my_100_free_ultimate_vibe_coding_guide/",
+            keyInsights: `• **Documented 4000+ Cursor prompts**: Captured entire AI-assisted workflow from a viral game (3M+ views on X)
+• **Community-driven knowledge**: 1300 GitHub stars from developers learning vibecoding patterns
+• **Multi-tool guidance**: Covers Cursor, Claude Code, Cline, and other AI coding platforms with workflow comparisons
+• **Viral project foundation**: Built on a game that gained massive traction; guide extracts lessons for others to replicate
+• **Open-source learning**: Free resource; encourages contributions and community enhancement
+• **Real-world iteration at scale**: Used by thousands; continuously updated based on community feedback`,
+            category: "web-app",
+            platforms: ["cursor", "claude-code"],
+            techStack: ["javascript", "next.js", "react", "node.js"],
+            githubUrl: "https://github.com/Enze/vibecoding",
+            featured: true,
+            authorId: systemUser.id,
+            screenshots: ["https://picsum.photos/800/450?random=2"]
+        },
+        {
+            title: "Terminal-Matrix Developer Portfolio",
+            description: "Full-stack developer portfolio featuring terminal interface, matrix effects, and advanced animations—entirely built with Claude Code without handwritten code.",
+            longDescription: "Read more: https://www.reddit.com/r/vibecoding/comments/1p1b26p/i_vibe_coded_my_entire_developer_portfolio/",
+            keyInsights: `• **100% Claude-generated**: Zero lines of handwritten code; developer only provided detailed prompts and design vision
+• **4-5 hour turnaround**: From concept to live production deployment—rapid iteration cycle
+• **Claude Sonnet 4 + extended thinking**: Used extended context to maintain design coherence across complex animations
+• **Prompt engineering as primary skill**: Developer focused on iterative refinement through conversation rather than coding
+• **Advanced UI patterns**: Terminal interface and matrix effects show Claude's capability for sophisticated visual design
+• **Pro plan leverage**: $20/month Claude Pro subscription enabled faster token processing and extended thinking`,
+            category: "web-app",
+            platforms: ["claude-code"],
+            techStack: ["react", "next.js", "typescript", "javascript", "tailwind"],
+            liveUrl: "https://ajkale.com",
+            featured: true,
+            authorId: systemUser.id,
+            screenshots: ["https://picsum.photos/800/450?random=3"]
+        },
+        {
+            title: "Vibe Coding: AI-Powered Portfolio Workshop",
+            description: "Educational workshop repository teaching developers how to build production-ready portfolios using AI, GitHub, and Vercel deployment—no prior coding experience required.",
+            longDescription: "Repo: https://github.com/arshchatrath/Vibe-coding",
+            keyInsights: `• **Workshop-structured learning**: Live deployment on day one; attendees walk away with deployed portfolio
+• **AI-as-copilot model**: ChatGPT → v0.dev → Vercel pipeline for fast UI generation
+• **Git & GitHub fundamentals**: Teaches version control basics as foundation for AI-assisted workflows
+• **Zero-to-production pipeline**: Prompt engineering → AI UI generation → one-click Vercel deployment
+• **Reusable prompt templates**: Provides AI prompt templates attendees can use for future projects
+• **No prior experience required**: Designed for beginners; uses intuitive tools (v0.dev) to abstract complexity`,
+            category: "web-app",
+            platforms: ["other"],
+            techStack: ["javascript", "react", "node.js", "vercel"],
+            githubUrl: "https://github.com/arshchatrath/Vibe-coding",
+            featured: true,
+            authorId: systemUser.id,
+            screenshots: ["https://picsum.photos/800/450?random=4"]
+        }
+    ];
+
+    console.log("Seeding Projects...");
+    for (const project of projects) {
+        await prisma.project.create({
+            data: project
+        });
+        console.log(`  ✓ Created project: ${project.title}`);
     }
 
     console.log("\n✅ Comprehensive seeding complete!");

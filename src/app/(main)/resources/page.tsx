@@ -3,17 +3,16 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { cn } from "@/lib/utils";
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, SparklesIcon } from "lucide-react";
 
 import {
     ResourcesIcon,
     YouTubeIcon,
-    GuidesIcon,
     XIcon
 } from "@/components/icons";
+import { ResourceBentoCard } from "@/components/resource-bento-card";
 import { TweetCard } from "@/components/tweet-card";
 import { ResourceCard } from "@/components/resource-card";
-
 
 export const metadata: Metadata = {
     title: "Resources | Vibe Stack",
@@ -26,13 +25,6 @@ const CATEGORIES = [
     { value: "blog", label: "Blog Posts", icon: ResourcesIcon },
     { value: "social", label: "Social Posts", icon: XIcon },
 ];
-
-
-const TYPE_CONFIG: Record<string, { color: string; bgColor: string }> = {
-    youtube: { color: "text-red-400", bgColor: "bg-red-500/10" },
-    blog: { color: "text-blue-400", bgColor: "bg-blue-500/10" },
-    social: { color: "text-purple-400", bgColor: "bg-purple-500/10" },
-};
 
 interface ResourcesPageProps {
     searchParams: Promise<{
@@ -57,9 +49,21 @@ async function CategorySidebar({ currentType }: { currentType?: string }) {
                 </h3>
                 <nav className="space-y-1">
                     {CATEGORIES.map((cat) => {
-                        const count = cat.value
-                            ? counts.find(c => c.type === cat.value)?._count.id || 0
-                            : total;
+                        let count = 0;
+
+                        if (!cat.value) {
+                            // All Resources
+                            count = total;
+                        } else if (cat.value === "blog") {
+                            // Sum blog and article types
+                            count = counts
+                                .filter(c => c.type === "blog" || c.type === "article")
+                                .reduce((acc, c) => acc + c._count.id, 0);
+                        } else {
+                            // Direct match for other types
+                            count = counts.find(c => c.type === cat.value)?._count.id || 0;
+                        }
+
                         const isActive = currentType === cat.value || (!currentType && !cat.value);
 
                         return (
@@ -95,9 +99,132 @@ async function CategorySidebar({ currentType }: { currentType?: string }) {
     );
 }
 
-// ... helper renderResourceCard ...
+async function ResourcesList({ searchParams }: { searchParams: ResourcesPageProps["searchParams"] }) {
+    const params = await searchParams;
+    const { type } = params;
 
-// ... ResourcesList ...
+    // Fetch all resources sorted
+    // Fetch all resources sorted
+    const where: Record<string, unknown> = { status: "APPROVED" };
+
+    if (type === "blog") {
+        where.type = { in: ["blog", "article"] };
+    } else if (type) {
+        where.type = type;
+    }
+
+    const resources = await prisma.resource.findMany({
+        where,
+        orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
+        take: 100,
+    });
+
+    if (resources.length === 0) {
+        return (
+            <div className="text-center py-20">
+                <div className="mx-auto w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mb-4">
+                    <ResourcesIcon className="h-8 w-8 text-muted-foreground" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">No resources found</h3>
+                <p className="text-muted-foreground text-sm">
+                    Be the first to{" "}
+                    <Link href="/submit/resource" className="underline hover:text-foreground">
+                        submit a resource
+                    </Link>
+                </p>
+            </div>
+        );
+    }
+
+    // Filter by type
+    const videos = resources.filter(r => r.type === "youtube");
+    const tweets = resources.filter(r => r.type === "social");
+    const blogs = resources.filter(r => r.type === "blog" || r.type === "article");
+
+    // Identify "Official" resources (heuristic: author name)
+    const official = resources.filter(r => {
+        const author = r.author?.toLowerCase() || "";
+        return author.includes("anthropic") || author.includes("google") || author.includes("openai") || r.tags.includes("official");
+    });
+
+    // If a specific type filter is active, show the grid of cards
+    // If NO filter (Library view), show the Bento Grid
+    if (type) {
+        // Standard Grid for filtered view
+        return (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {resources.map((resource) => {
+                    if (resource.type === "social") {
+                        return (
+                            <TweetCard
+                                key={resource.id}
+                                author={{
+                                    name: resource.author || "Unknown",
+                                    handle: resource.source || (resource.author ? `@${resource.author.replace(/\s+/g, '').toLowerCase()}` : "@unknown"),
+                                    avatar: resource.thumbnail || "https://github.com/shadcn.png",
+                                }}
+                                content={resource.description || resource.title}
+                                href={resource.url}
+                            />
+                        );
+                    }
+                    return <ResourceCard key={resource.id} resource={resource} />;
+                })}
+            </div>
+        );
+    }
+
+    // Bento Grid View (Library Dashboard)
+    return (
+        <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-[500px]">
+            {/* X Posts / Community Vibe */}
+            <ResourceBentoCard
+                title="X Posts"
+                subtitle="Threads, insights & hot takes"
+                icon={XIcon}
+                resources={tweets}
+                type="social"
+                href="/resources?type=social"
+                className="lg:col-span-1"
+            />
+
+            {/* Videos */}
+            <ResourceBentoCard
+                title="Videos"
+                subtitle="Tutorials, demos & deep dives"
+                icon={YouTubeIcon}
+                resources={videos}
+                type="youtube"
+                href="/resources?type=youtube"
+                className="lg:col-span-1"
+            />
+
+            {/* Blogs */}
+            <ResourceBentoCard
+                title="Blog Posts"
+                subtitle="Articles, guides & analysis"
+                icon={ResourcesIcon}
+                resources={blogs}
+                type="blog"
+                href="/resources?type=blog"
+                className="lg:col-span-1"
+            />
+
+            {/* Official / Featured Updates (Optional 4th card example) */}
+            {official.length > 0 && (
+                <ResourceBentoCard
+                    title="From Anthropic"
+                    subtitle="Official updates & announcements"
+                    icon={SparklesIcon}
+                    resources={official}
+                    type="official"
+                    href="/resources?type=official"
+                    className="lg:col-span-1"
+                />
+            )}
+        </div>
+    );
+}
 
 export default async function ResourcesPage({ searchParams }: ResourcesPageProps) {
     const params = await searchParams;
@@ -130,17 +257,17 @@ export default async function ResourcesPage({ searchParams }: ResourcesPageProps
                     </Suspense>
 
                     {/* Main Content */}
-                    <Suspense fallback={
-                        <div className="flex-1 space-y-6">
+                    <div className="flex-1">
+                        <Suspense fallback={
                             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                                 {[...Array(6)].map((_, i) => (
-                                    <div key={i} className="rounded-xl border border-border bg-card overflow-hidden animate-pulse h-[300px]" />
+                                    <div key={i} className="rounded-2xl border border-border bg-card overflow-hidden animate-pulse h-[500px]" />
                                 ))}
                             </div>
-                        </div>
-                    }>
-                        <ResourcesList searchParams={searchParams} />
-                    </Suspense>
+                        }>
+                            <ResourcesList searchParams={searchParams} />
+                        </Suspense>
+                    </div>
                 </div>
             </div>
 
