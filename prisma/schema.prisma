@@ -154,7 +154,6 @@ model PlatformProfile {
   cheatSheet  String[] // Array of key points
   
   // New fields for enhanced content
-  workflows   Workflow[]
   prompts     PromptTemplate[]
   
   createdAt   DateTime @default(now())
@@ -163,32 +162,7 @@ model PlatformProfile {
   @@index([platformId])
 }
 
-// =============================================================================
-// Workflow Model (Best practices, hacks, rules)
-// =============================================================================
-model Workflow {
-  id          String   @id @default(cuid())
-  title       String
-  slug        String   @unique
-  description String   @db.Text
-  content     String   @db.Text // Markdown - the full workflow guide
-  category    String   // e.g., "setup", "debugging", "refactoring", "testing", "rules"
-  difficulty  String   @default("beginner") // beginner, intermediate, advanced
-  
-  // Platform relation
-  platformId  String
-  platform    PlatformProfile @relation(fields: [platformId], references: [id], onDelete: Cascade)
-  
-  // Engagement
-  viewCount   Int      @default(0)
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
 
-  @@index([platformId])
-  @@index([category])
-  @@index([slug])
-}
 
 // =============================================================================
 // PromptTemplate Model (Claude skills, prompt patterns)

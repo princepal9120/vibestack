@@ -2,7 +2,18 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Play, ExternalLink, MessageSquare, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Resource } from "@prisma/client";
+
+export interface Resource {
+    id: string;
+    title: string;
+    description: string | null;
+    url: string;
+    type: string;
+    author: string | null;
+    source: string | null;
+    thumbnail: string | null;
+    // Add other fields if needed for compatibility
+}
 
 interface ResourceBentoCardProps {
     title: string;

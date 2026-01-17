@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { ExternalLink, Twitter, Youtube, FileText } from "lucide-react";
-import { Resource } from "@prisma/client";
+import { Resource } from "@/components/resource-bento-card";
 
 // Types
 interface ContentItem {

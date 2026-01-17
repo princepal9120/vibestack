@@ -22,14 +22,7 @@ const collections = [
         count: "25+",
         gradient: "from-purple-500/20 to-purple-600/10",
     },
-    {
-        title: "Workflows",
-        description: "Best practices, setup guides, and productivity hacks for AI tools",
-        href: "/collections/workflows",
-        icon: WorkflowsIcon,
-        count: "30+",
-        gradient: "from-amber-500/20 to-amber-600/10",
-    },
+
     {
         title: "MCPs",
         description: "Model Context Protocol servers for database, cloud, and productivity integrations",

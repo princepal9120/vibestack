@@ -32,7 +32,6 @@ const navItems = [
 const collectionsItems = [
     { href: "/collections/skills", label: "Skills", icon: SkillsIcon, description: "Modular AI capabilities" },
     { href: "/collections/subagents", label: "Sub-Agents", icon: SubAgentsIcon, description: "Role-specific AI agents" },
-    { href: "/collections/workflows", label: "Workflows", icon: WorkflowsIcon, description: "Best practices & guides" },
     { href: "/collections/mcps", label: "MCPs", icon: MCPIcon, description: "Model Context Protocol" },
 ];
 

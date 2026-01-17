@@ -24,8 +24,9 @@ async function main() {
     await prisma.comment.deleteMany();
     await prisma.upvote.deleteMany();
     await prisma.project.deleteMany();
+
     // await prisma.resource.deleteMany(); // Preserving resources to avoid re-fetching
-    console.log("Removed all projects.");
+    console.log("Removed all projects, collections, and workflows.");
 
     // Seed Platform Profiles
     const platforms = [
@@ -696,46 +697,7 @@ Advanced code completion:
         console.log(`  ✓ Created platform: ${platform.name}`);
     }
 
-    // Seed Collections
-    const collections = [
-        {
-            title: "Best Web Apps",
-            slug: "best-web-apps",
-            description: "A curated collection of the best web applications built with AI coding tools. From SaaS products to developer tools, see what's possible when you vibe code.",
-            projectIds: [],
-            curator: "Vibe Stack Team",
-        },
-        {
-            title: "CLI Tools",
-            slug: "cli-tools",
-            description: "Command-line tools and utilities built with AI assistance. Discover powerful CLI applications created using Cursor, Claude Code, and other AI coding platforms.",
-            projectIds: [],
-            curator: "Vibe Stack Team",
-        },
-        {
-            title: "Open Source Gems",
-            slug: "open-source-gems",
-            description: "Outstanding open-source projects built with AI coding tools. Contribute, learn, and get inspired by these community-driven creations.",
-            projectIds: [],
-            curator: "Vibe Stack Team",
-        },
-        {
-            title: "Beginner Friendly",
-            slug: "beginner-friendly",
-            description: "Perfect starting points for developers new to AI-assisted coding. Simple projects with clear code and great learning potential.",
-            projectIds: [],
-            curator: "Vibe Stack Team",
-        },
-    ];
 
-    for (const collection of collections) {
-        await prisma.collection.upsert({
-            where: { slug: collection.slug },
-            update: collection,
-            create: collection,
-        });
-        console.log(`  ✓ Created collection: ${collection.title}`);
-    }
 
     // Get platform IDs for relations
     const cursorProfile = await prisma.platformProfile.findUnique({ where: { platformId: "cursor" } });
@@ -1081,14 +1043,7 @@ cat AGENTS.md
         });
     }
 
-    for (const workflow of workflows) {
-        await prisma.workflow.upsert({
-            where: { slug: workflow.slug },
-            update: workflow,
-            create: workflow,
-        });
-        console.log(`  ✓ Created workflow: ${workflow.title}`);
-    }
+
 
     // Seed Prompt Templates
     const prompts = [];
@@ -2609,7 +2564,8 @@ jobs:
                     type: "article", // Force type to article
                     source: `@${tweet.user.screen_name}`,
                     author: tweet.user.name,
-                    thumbnail: tweet.user.profile_image_url_https,
+                    // Try to get media photo, fallback to profile image
+                    thumbnail: tweet.mediaDetails?.[0]?.media_url_https || tweet.user.profile_image_url_https,
                     status: "APPROVED",
                     viewCount: Math.floor(Math.random() * 1000),
                 }
