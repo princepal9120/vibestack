@@ -527,3 +527,94 @@ export function ResourcesSection({ resources }: { resources?: any[] }) {
     );
 }
 
+
+import { TweetCard } from "@/components/tweet-card";
+
+const testimonials = [
+    {
+        author: {
+            name: "Prajwal Tomar",
+            handle: "@PrajwalTomar_",
+            avatar: "https://github.com/shadcn.png" // Placeholder or verify if valid
+        },
+        content: "Stop saying AI can't design. Cursor + Opus 4.5 just helped me build a landing page with scrollytelling animations in under 10 mins that designers charge thousands for. If your landing page still looks like a 2010 app, that's not an AI problem. That's a workflow problem"
+    },
+    {
+        author: {
+            name: "Andrej Karpathy",
+            handle: "@karpathy",
+            avatar: "https://avatars.githubusercontent.com/u/241138?v=4"
+        },
+        content: "I was inspired by this so I wanted to see if Claude Code can get into my Lutron home automation system."
+    },
+    {
+        author: {
+            name: "Lenny Rachitsky",
+            handle: "@lennysan",
+            avatar: "https://avatars.githubusercontent.com/u/1665675?v=4" // Placeholder
+        },
+        content: "Testing out the new Claude Cowork. I asked it to go through every Lenny's Podcast episode and pull out the 10 most important themes and lessons for product builders. Then, the 10 most counterintuitive truths. I gave it access to a folder with 320 transcripts."
+    },
+    {
+        author: {
+            name: "Pietro Schirano",
+            handle: "@skirano",
+            avatar: "https://avatars.githubusercontent.com/u/1680273?v=4"
+        },
+        content: "Claude Code isn't just for coding. I fed it my raw DNA data from an ancestry test and used it to find health related genes I should keep an eye on."
+    },
+    {
+        author: {
+            name: "zefram.eth",
+            handle: "@boredGenius",
+            avatar: "https://avatars.githubusercontent.com/u/38220395?v=4" // Placeholder
+        },
+        content: "Introducing CallMe, a minimal plugin that lets Claude Code call you on the phone. Start a task, walk away. Your phone/watch rings when Claude is done, stuck, or needs a decision. Free & open source (MIT)."
+    },
+    {
+        author: {
+            name: "Nutlope",
+            handle: "@Nutlope",
+            avatar: "https://avatars.githubusercontent.com/u/124599?v=4"
+        },
+        content: "Just used Vibe Stack's workflow for Next.js app router + Supabase. Saved me about 4 hours of boilerplate setup. The prompt library is actually insane."
+    }
+];
+
+export function TestimonialsSection() {
+    return (
+        <section className="border-t border-border bg-black/5 py-24">
+            <div className="container">
+                <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
+                    variants={fadeUp}
+                    className="mb-16 text-center"
+                >
+                    <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+                        Community Vibes
+                    </h2>
+                    <p className="mt-4 text-lg text-muted-foreground">
+                        See how developers are using AI to build faster and better.
+                    </p>
+                </motion.div>
+
+                <div className="columns-1 gap-6 md:columns-2 lg:columns-3 space-y-6">
+                    {testimonials.map((testimonial, i) => (
+                        <motion.div
+                            key={i}
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.5, delay: i * 0.1 }}
+                            className="break-inside-avoid"
+                        >
+                            <TweetCard {...testimonial} />
+                        </motion.div>
+                    ))}
+                </div>
+            </div>
+        </section>
+    );
+}

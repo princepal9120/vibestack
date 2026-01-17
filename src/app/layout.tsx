@@ -22,9 +22,7 @@ export const metadata: Metadata = {
     template: "%s | Vibe Stack",
   },
   description: "Share and discover the best AI coding projects, resources, and workflows.",
-  icons: {
-    icon: "/favicon.ico",
-  },
+
   openGraph: {
     type: "website",
   },

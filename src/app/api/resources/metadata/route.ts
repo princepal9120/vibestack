@@ -49,42 +49,30 @@ async function fetchYouTubeMetadata(url: string): Promise<Metadata | null> {
     }
 }
 
-// Fetch X/Twitter metadata using oEmbed API
+import { getTweet } from "react-tweet/api";
+
+// Fetch X/Twitter metadata using react-tweet API
 async function fetchTwitterMetadata(url: string): Promise<Metadata | null> {
     try {
-        // Use publish.twitter.com oEmbed API
-        const oembedUrl = `https://publish.twitter.com/oembed?url=${encodeURIComponent(url)}&omit_script=true`;
-        const response = await fetch(oembedUrl);
+        const idMatch = url.match(/(?:twitter\.com|x\.com)\/(?:[^/]+)\/status\/([0-9]+)/);
+        const tweetId = idMatch ? idMatch[1] : null;
 
-        if (!response.ok) {
-            // Fallback to basic handle extraction if oEmbed fails
-            const handleMatch = url.match(/(?:twitter\.com|x\.com)\/(@?[\w]+)/);
-            const handle = handleMatch ? handleMatch[1] : undefined;
-            return {
-                title: `Post by @${handle}`,
-                type: "twitter",
-                authorHandle: handle ? `@${handle}` : undefined,
-            };
-        }
+        if (!tweetId) return null;
 
-        const data = await response.json();
+        const tweet = await getTweet(tweetId);
 
-        // Extract handle from author_url
-        const handleMatch = data.author_url.match(/(?:twitter\.com|x\.com)\/(@?[\w]+)/);
-        const handle = handleMatch ? handleMatch[1] : undefined;
-
-        // Clean up title/description from html (oEmbed returns HTML blockquote)
-        // We'll use the author_name and handle for the title if can't extract cleanly
+        if (!tweet) return null;
 
         return {
-            title: `Post by ${data.author_name}`,
-            description: "View on X", // oEmbed doesn't give clean text, just HTML
-            authorName: data.author_name,
-            authorHandle: handle ? `@${handle}` : undefined,
+            title: `Post by ${tweet.user.name}`,
+            description: tweet.text,
+            authorName: tweet.user.name,
+            authorHandle: `@${tweet.user.screen_name}`,
+            thumbnailUrl: tweet.user.profile_image_url_https.replace("_normal", ""), // Get higher res image
             type: "twitter",
-            // Twitter oEmbed doesn't provide a thumbnail image directly easily without parsing HTML
         };
-    } catch {
+    } catch (error) {
+        console.error("Error fetching tweet:", error);
         return null;
     }
 }

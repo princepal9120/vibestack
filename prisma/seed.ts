@@ -3,6 +3,7 @@ config({ path: ".env" });
 
 import { PrismaClient, ResourceStatus } from "@prisma/client";
 import { PrismaNeon } from "@prisma/adapter-neon";
+import { getTweet } from "react-tweet/api";
 
 function createPrismaClient() {
     const connectionString = process.env.DATABASE_URL;
@@ -10,16 +11,21 @@ function createPrismaClient() {
         throw new Error("DATABASE_URL is not set");
     }
 
-    // PrismaNeon uses connectionString parameter
     const adapter = new PrismaNeon({ connectionString });
-
     return new PrismaClient({ adapter });
 }
 
 const prisma = createPrismaClient();
 
 async function main() {
-    console.log("🌱 Seeding database with comprehensive content...");
+    console.log("🌱 Seeding database...");
+
+    // Clear user-generated content
+    await prisma.comment.deleteMany();
+    await prisma.upvote.deleteMany();
+    await prisma.project.deleteMany();
+    await prisma.resource.deleteMany();
+    console.log("Removed all projects and resources.");
 
     // Seed Platform Profiles
     const platforms = [
@@ -1350,14 +1356,7 @@ For each issue found:
         },
     ];
 
-    for (const resource of resources) {
-        await prisma.resource.upsert({
-            where: { url: resource.url },
-            update: resource,
-            create: resource,
-        });
-        console.log(`  ✓ Created resource: ${resource.title}`);
-    }
+    // (Removed original example resources)
 
     // Seed End-to-End Guides
     const guides = [
@@ -2263,6 +2262,254 @@ jobs:
             create: skill,
         });
         console.log(`  ✓ Created Skill: ${skill.name}`);
+    }
+
+    // Seed Social Posts (Tweets) as requested
+    const tweetUrls = [
+        "https://x.com/milesdeutscher/status/2011542096164036702",
+        "https://x.com/claudeai/status/2010805682434666759",
+        "https://x.com/ericw_ai/status/2010019062873837961",
+        "https://x.com/heyshrutimishra/status/2008863725550539083",
+        "https://x.com/tobi/status/2010438500609663110",
+        // New batch
+        "https://x.com/RiverNotFlowing/status/2012533136589303963",
+        "https://x.com/RisonSimon/status/2012533085661737142",
+        "https://x.com/joshnomics/status/2012533073087185064",
+        "https://x.com/DhruvalGolakiya/status/2012533016548302878",
+        "https://x.com/__roycohen/status/2012532935560180011",
+        "https://x.com/alwinrajkumar/status/2012532875795521935",
+        "https://x.com/internetartsy/status/2012532862877139082",
+        "https://x.com/Aykutuces/status/2012532809043206382",
+        "https://x.com/kengdaica/status/2012532784007680200",
+        "https://x.com/CryptoOverAI/status/2012532769188954303",
+        "https://x.com/AlinCatalin/status/2012532478204899559",
+        "https://x.com/ddotdev/status/2012532440972120350",
+        "https://x.com/murd_arch/status/2012532318758379607",
+        "https://x.com/john_skult/status/2012532247359111513",
+        "https://x.com/ennycodes/status/2012532233051988243",
+        "https://x.com/vincenzolandino/status/2012532144178966852",
+        "https://x.com/naveenmiitk/status/2012531983382143473",
+        "https://x.com/MinaGawargious/status/2012531930655301671",
+        "https://x.com/MosesSenpai/status/2012531890440274287"
+    ];
+
+    console.log("Seeding Tweets...");
+
+    for (const url of tweetUrls) {
+        try {
+            const id = url.split("/").pop();
+            if (!id) continue;
+
+            // Fetch tweet data using react-tweet
+            const tweet = await getTweet(id).catch(() => null);
+
+            if (!tweet) {
+                console.warn(`  ! Could not fetch tweet ${id} (might be invalid ID or API limit). Skipping.`);
+                continue;
+            }
+
+            // Create Resource
+            await prisma.resource.create({
+                data: {
+                    title: `Post by ${tweet.user.name}`,
+                    description: tweet.text,
+                    url: url,
+                    type: "social",
+                    source: `@${tweet.user.screen_name}`, // Storing handle in 'source' field
+                    author: tweet.user.name,
+                    thumbnail: tweet.user.profile_image_url_https,
+                    status: "APPROVED",
+                    viewCount: Math.floor(Math.random() * 1000),
+                }
+            });
+            console.log(`  ✓ Seeded tweet: ${id}`);
+        } catch (error) {
+            console.error(`  x Failed to seed ${url}:`, error);
+        }
+    }
+
+    // Seed YouTube Tutorials
+    const youtubeTutorials = [
+        {
+            title: "A Complete Guide to Claude Code - Here are ALL the Best Strategies",
+            url: "https://www.youtube.com/watch?v=amEUIuBKwvg",
+            description: "Comprehensive guide covering the best strategies for using Claude Code",
+            type: "youtube",
+            source: "YouTube",
+            author: "YouTube", // We don't have channel name in the list, default to generic or extract if possible? I'll use "YouTube" for now or leave generic.
+            thumbnail: "https://img.youtube.com/vi/amEUIuBKwvg/maxresdefault.jpg", // Construct thumbnail from ID
+            status: "APPROVED"
+        },
+        {
+            title: "Claude Code Advanced Masterclass in Under 81 Mins",
+            url: "https://www.youtube.com/watch?v=59gy_24KIVE",
+            description: "Advanced techniques for product managers and developers",
+            type: "youtube",
+            source: "YouTube",
+            thumbnail: "https://img.youtube.com/vi/59gy_24KIVE/maxresdefault.jpg",
+            status: "APPROVED"
+        },
+        {
+            title: "How to Set Up Claude Code in 2026 (Beginner Tutorial)",
+            url: "https://www.youtube.com/watch?v=kddjxKEeCuM",
+            description: "Complete beginner setup guide for Windows, macOS, and Linux, including VS Code and Cursor integration",
+            type: "youtube",
+            source: "YouTube",
+            thumbnail: "https://img.youtube.com/vi/kddjxKEeCuM/maxresdefault.jpg",
+            status: "APPROVED"
+        },
+        {
+            title: "Claude Code for Absolute Beginners: STEP-BY-STEP",
+            url: "https://www.youtube.com/watch?v=v1ynWeHhzXs",
+            description: "Beginner-friendly walkthrough covering file creation, custom agents, and project management",
+            type: "youtube",
+            source: "YouTube",
+            thumbnail: "https://img.youtube.com/vi/v1ynWeHhzXs/maxresdefault.jpg",
+            status: "APPROVED"
+        },
+        {
+            title: "Claude Code Tutorial for Beginners",
+            url: "https://www.youtube.com/watch?v=eMZmDH3T2bY", // Removing &vl=en for cleaner URL
+            description: "Essential tutorial covering prompt structuring, Plan mode, and working with existing codebases",
+            type: "youtube",
+            source: "YouTube",
+            thumbnail: "https://img.youtube.com/vi/eMZmDH3T2bY/maxresdefault.jpg",
+            status: "APPROVED"
+        },
+        {
+            title: "Claude Code Masterclass: From Beginner to Expert in 33 Minutes",
+            url: "https://www.youtube.com/watch?v=PCvbhY4xV2c",
+            description: "Complete masterclass covering installation, debugging, subagents, and building full applications",
+            type: "youtube",
+            source: "YouTube",
+            thumbnail: "https://img.youtube.com/vi/PCvbhY4xV2c/maxresdefault.jpg",
+            status: "APPROVED"
+        },
+        {
+            title: "Claude Code Masterclass: Become a ONE-Person Company",
+            url: "https://www.youtube.com/watch?v=6qJsw0n0GGw",
+            description: "Advanced blueprint for creating an AI factory, including multimodal mastery and framework replication",
+            type: "youtube",
+            source: "YouTube",
+            thumbnail: "https://img.youtube.com/vi/6qJsw0n0GGw/maxresdefault.jpg",
+            status: "APPROVED"
+        },
+        {
+            title: "How to 10X Claude Code workflows (from its creator)",
+            url: "https://www.youtube.com/watch?v=wnRQI4WZlPY",
+            description: "Expert tips directly from the creator on optimizing Claude Code workflows",
+            type: "youtube",
+            source: "YouTube",
+            thumbnail: "https://img.youtube.com/vi/wnRQI4WZlPY/maxresdefault.jpg",
+            status: "APPROVED"
+        },
+        {
+            title: "Cursor AI Tutorial for Beginners",
+            url: "https://www.youtube.com/watch?v=3289vhOUdKA",
+            description: "Covers panel layout, AI chat, agents, and real-world applications with MCP servers",
+            type: "youtube",
+            source: "YouTube",
+            thumbnail: "https://img.youtube.com/vi/3289vhOUdKA/maxresdefault.jpg",
+            status: "APPROVED"
+        },
+        {
+            title: "Claude Code + Cursor COURSE - Build a FULL App",
+            url: "https://www.youtube.com/watch?v=w5DcGBv-cqg",
+            description: "Full course on building complete apps using Claude Code and Cursor with Nuxt.js",
+            type: "youtube",
+            source: "YouTube",
+            thumbnail: "https://img.youtube.com/vi/w5DcGBv-cqg/maxresdefault.jpg",
+            status: "APPROVED"
+        },
+        {
+            title: "Cursor AI Tutorial: 10x Your Coding Productivity in 2026",
+            url: "https://www.youtube.com/watch?v=bsJkQGUKc1A",
+            description: "Latest 2026 tutorial on agent modes, debugging, and choosing the right AI model",
+            type: "youtube",
+            source: "YouTube",
+            thumbnail: "https://img.youtube.com/vi/bsJkQGUKc1A/maxresdefault.jpg",
+            status: "APPROVED"
+        },
+        {
+            title: "Learn 80% of Cursor AI 2.0 in Under 22 Minutes! (2026)",
+            url: "https://www.youtube.com/watch?v=-PcOTX15geI",
+            description: "Quick guide to Cursor 2.0's new Composer model and agents",
+            type: "youtube",
+            source: "YouTube",
+            thumbnail: "https://img.youtube.com/vi/-PcOTX15geI/maxresdefault.jpg",
+            status: "APPROVED"
+        },
+        {
+            title: "OpenCode + AntiGravity is INSANE!",
+            url: "https://www.youtube.com/watch?v=DS37JuZ2IP8",
+            description: "Latest tutorial showing how to deploy multiple AI agents like Claude 4.5 and Gemini 3 Pro",
+            type: "youtube",
+            source: "YouTube",
+            thumbnail: "https://img.youtube.com/vi/DS37JuZ2IP8/maxresdefault.jpg",
+            status: "APPROVED"
+        },
+        {
+            title: "OpenCode: Build ANYTHING!",
+            url: "https://www.youtube.com/watch?v=PCnvVs6UmKk",
+            description: "Step-by-step guide on downloading, setting up, and building projects with OpenCode using plain English prompts",
+            type: "youtube",
+            source: "YouTube",
+            thumbnail: "https://img.youtube.com/vi/PCnvVs6UmKk/maxresdefault.jpg",
+            status: "APPROVED"
+        },
+        {
+            title: "OpenCode AI Agent Setup: From Zero to Custom Skills",
+            url: "https://www.youtube.com/watch?v=vHkLrDD2xrU",
+            description: "Comprehensive guide on installation, model configuration, and creating custom agent skills",
+            type: "youtube",
+            source: "YouTube",
+            thumbnail: "https://img.youtube.com/vi/vHkLrDD2xrU/maxresdefault.jpg",
+            status: "APPROVED"
+        },
+        {
+            title: "Google's FREE AI Coding Tool Antigravity Tutorial",
+            url: "https://www.youtube.com/watch?v=RMs8QPtpiSg",
+            description: "Complete 24-hour test review with download, setup, and React project creation",
+            type: "youtube",
+            source: "YouTube",
+            thumbnail: "https://img.youtube.com/vi/RMs8QPtpiSg/maxresdefault.jpg",
+            status: "APPROVED"
+        },
+        {
+            title: "How to use Google Antigravity for beginners (AI IDE)",
+            url: "https://www.youtube.com/watch?v=QOpfCGa_2SU",
+            description: "Beginner's guide covering installation, Gemini 3 features, and building a to-do app from scratch",
+            type: "youtube",
+            source: "YouTube",
+            thumbnail: "https://img.youtube.com/vi/QOpfCGa_2SU/maxresdefault.jpg",
+            status: "APPROVED"
+        },
+        {
+            title: "Automate Coding with OpenAI Codex - Full Tutorial",
+            url: "https://www.youtube.com/watch?v=dL0uvPXYi28",
+            description: "Tutorial on automating coding workflows with OpenAI Codex, GitHub integration, and Zapier automation",
+            type: "youtube",
+            source: "YouTube",
+            thumbnail: "https://img.youtube.com/vi/dL0uvPXYi28/maxresdefault.jpg",
+            status: "APPROVED"
+        }
+    ];
+
+    console.log("Seeding YouTube Videos...");
+    for (const video of youtubeTutorials) {
+        await prisma.resource.upsert({
+            where: { url: video.url },
+            update: {
+                ...video,
+                status: ResourceStatus.APPROVED
+            },
+            create: {
+                ...video,
+                status: ResourceStatus.APPROVED,
+                viewCount: Math.floor(Math.random() * 500)
+            }
+        });
+        console.log(`  ✓ Seeded video: ${video.title.substring(0, 30)}...`);
     }
 
     console.log("\n✅ Comprehensive seeding complete!");

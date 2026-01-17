@@ -27,6 +27,8 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 
+// In Next.js 16, the file convention changed from middleware.ts to proxy.ts
+// The clerkMiddleware function still works the same way - it wraps our proxy function
 export default clerkMiddleware(async (auth, req) => {
     // Protect routes that need authentication
     if (isProtectedRoute(req)) {

@@ -7,6 +7,7 @@ import {
   PlatformsSection,
   ResourcesSection,
   CTASection,
+  TestimonialsSection,
 } from "@/components/landing-sections";
 import { prisma } from "@/lib/prisma";
 
@@ -67,6 +68,7 @@ export default async function HomePage() {
         <FeaturedProjectsSection projects={featuredProjects} />
         <FeaturesSection />
         <PlatformsSection />
+        <TestimonialsSection />
         <ResourcesSection resources={featuredResources} />
         <CTASection />
       </main>

@@ -20,6 +20,7 @@ import {
     AlertCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { TweetCard } from "@/components/tweet-card";
 
 const RESOURCE_TYPES = [
     {
@@ -322,8 +323,23 @@ export default function SubmitResourcePage() {
                             </div>
                         </div>
 
-                        {/* Metadata Preview Card */}
-                        {metadata && metadata.thumbnailUrl && (
+                        {/* Social/Tweet Preview */}
+                        {selectedType === "social" && (formData.description || formData.authorName) && (
+                            <div className="space-y-2 mb-6">
+                                <label className="text-sm font-medium">Preview</label>
+                                <TweetCard
+                                    author={{
+                                        name: formData.authorName || "Author Name",
+                                        handle: formData.authorHandle || "@handle",
+                                        avatar: formData.thumbnailUrl || "https://github.com/shadcn.png",
+                                    }}
+                                    content={formData.description || "Tweet content will appear here..."}
+                                />
+                            </div>
+                        )}
+
+                        {/* Standard Metadata Preview (for non-social) */}
+                        {selectedType !== "social" && metadata && metadata.thumbnailUrl && (
                             <div className="relative rounded-xl border border-border bg-card overflow-hidden">
                                 <div className="aspect-video relative bg-muted">
                                     <Image

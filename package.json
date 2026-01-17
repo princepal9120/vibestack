@@ -33,6 +33,7 @@
     "prisma": "^7.2.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-tweet": "^3.3.0",
     "slugify": "^1.6.6",
     "sonner": "^2.0.7",
     "svix": "^1.84.1",

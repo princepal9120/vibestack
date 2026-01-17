@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- V shape -->
+  <path d="M4 6L16 20L28 6" stroke="#E88A1E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Stacked lines -->
+  <rect x="10" y="22" width="12" height="2" rx="1" fill="#E88A1E"/>
+  <rect x="8" y="26" width="16" height="2" rx="1" fill="#E88A1E"/>
+</svg>
