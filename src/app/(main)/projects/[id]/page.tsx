@@ -13,23 +13,33 @@ import {
     Calendar,
     Eye,
     MessageCircle,
+    ArrowLeft,
+    Share2,
+    ArrowUp,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { Badge } from "@/components/ui/badge";
 
 interface ProjectPageProps {
-    params: Promise<{ id: string }>;
+    params: {
+        id: string;
+    };
 }
 
-export async function generateMetadata({
-    params,
-}: ProjectPageProps): Promise<Metadata> {
-    const { id } = await params;
+// Generate Dynamic Metadata
+export async function generateMetadata({ params }: ProjectPageProps): Promise<Metadata> {
     const project = await prisma.project.findUnique({
-        where: { id },
-        select: { title: true, description: true },
+        where: { id: params.id },
+        include: { author: true },
     });
 
-    if (!project) return { title: "Project Not Found" };
+    if (!project) {
+        return {
+            title: "Project Not Found",
+        };
+    }
+
+    const ogImage = project.screenshots[0] || `/api/og?title=${encodeURIComponent(project.title)}&type=Project&description=${encodeURIComponent(project.description)}`;
 
     return {
         title: project.title,

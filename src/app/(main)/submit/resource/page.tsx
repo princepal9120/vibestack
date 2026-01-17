@@ -24,27 +24,27 @@ import { cn } from "@/lib/utils";
 const RESOURCE_TYPES = [
     {
         value: "social",
-        label: "X Post",
+        label: "Social Post",
         icon: Twitter,
-        description: "X/Twitter threads and posts",
+        description: "X/Twitter threads & Reddit discussions",
         color: "bg-sky-500/10 text-sky-500 border-sky-500/20",
-        placeholder: "https://x.com/...",
+        placeholder: "https://x.com/... or https://reddit.com/r/...",
     },
     {
         value: "youtube",
         label: "YouTube Video",
         icon: Youtube,
-        description: "Video tutorials and demos",
+        description: "Video tutorials, demos & deep dives",
         color: "bg-red-500/10 text-red-500 border-red-500/20",
         placeholder: "https://youtube.com/watch?v=...",
     },
     {
         value: "blog",
-        label: "Blog Post",
+        label: "Article / Guide",
         icon: BookOpen,
-        description: "Articles, guides, and written content",
+        description: "Medium, Substack, Dev.to, or personal blogs",
         color: "bg-primary/10 text-primary border-primary/20",
-        placeholder: "https://...",
+        placeholder: "https://medium.com/...",
     },
 ];
 
@@ -413,6 +413,36 @@ export default function SubmitResourcePage() {
                                         className="w-full rounded-xl border border-border bg-card px-4 py-3 text-sm placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                                     />
                                 </div>
+                            </div>
+                        )}
+
+                        {/* Thumbnail URL for articles (optional - if auto-fetch failed) */}
+                        {selectedType === "blog" && !metadata?.thumbnailUrl && (
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">
+                                    Thumbnail Image URL <span className="text-muted-foreground text-xs">(optional)</span>
+                                </label>
+                                <input
+                                    type="url"
+                                    placeholder="https://example.com/og-image.png"
+                                    value={formData.thumbnailUrl}
+                                    onChange={(e) => setFormData({ ...formData, thumbnailUrl: e.target.value })}
+                                    className="w-full rounded-xl border border-border bg-card px-4 py-3 text-sm placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                />
+                                <p className="text-xs text-muted-foreground">
+                                    Paste the Open Graph image URL if automatic fetching didn&apos;t work. Try right-clicking the article&apos;s preview image and copying the image URL.
+                                </p>
+                                {formData.thumbnailUrl && (
+                                    <div className="relative aspect-video rounded-lg border border-border bg-muted overflow-hidden mt-2">
+                                        <Image
+                                            src={formData.thumbnailUrl}
+                                            alt="Thumbnail preview"
+                                            fill
+                                            className="object-cover"
+                                            unoptimized
+                                        />
+                                    </div>
+                                )}
                             </div>
                         )}
 

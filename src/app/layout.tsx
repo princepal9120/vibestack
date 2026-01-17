@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
-import { ClerkProvider } from "@clerk/nextjs";
-import { ThemeProvider } from "next-themes";
-import { Toaster } from "sonner";
-import { Geist, Geist_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Geist, Geist_Mono } from "next/font/google"; // Reverting to Google Fonts
 import "./globals.css";
+import { ClerkProvider } from "@clerk/nextjs";
+import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,15 +16,16 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://vibestack.ai"),
   title: {
+    default: "Vibe Stack - Modern AI Coding Platform",
     template: "%s | Vibe Stack",
-    default: "Vibe Stack - Community Platform for AI-Assisted Coding",
   },
-  description:
-    "The community-driven platform for AI-assisted coding. Discover workflows, share projects, and master the art of vibe coding.",
+  description: "Share and discover the best AI coding projects, resources, and workflows.",
+  icons: {
+    icon: "/favicon.ico",
+  },
   openGraph: {
-    title: "Vibe Stack",
-    description: "Community Platform for AI-Assisted Coding",
     type: "website",
   },
 };

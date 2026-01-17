@@ -7,7 +7,7 @@ interface Metadata {
     authorName?: string;
     authorHandle?: string;
     duration?: string;
-    type: "youtube" | "twitter" | "article";
+    type: "youtube" | "twitter" | "reddit" | "article";
 }
 
 // Extract YouTube video ID from various URL formats
@@ -49,21 +49,17 @@ async function fetchYouTubeMetadata(url: string): Promise<Metadata | null> {
     }
 }
 
-// Fetch X/Twitter metadata by parsing OG tags
+// Fetch X/Twitter metadata using oEmbed API
 async function fetchTwitterMetadata(url: string): Promise<Metadata | null> {
     try {
-        // Extract handle from URL
-        const handleMatch = url.match(/(?:twitter\.com|x\.com)\/(@?[\w]+)/);
-        const handle = handleMatch ? handleMatch[1] : undefined;
-
-        // Try to fetch OG tags (may be blocked by Twitter, fallback to basic info)
-        const response = await fetch(url, {
-            headers: {
-                "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
-            },
-        });
+        // Use publish.twitter.com oEmbed API
+        const oembedUrl = `https://publish.twitter.com/oembed?url=${encodeURIComponent(url)}&omit_script=true`;
+        const response = await fetch(oembedUrl);
 
         if (!response.ok) {
+            // Fallback to basic handle extraction if oEmbed fails
+            const handleMatch = url.match(/(?:twitter\.com|x\.com)\/(@?[\w]+)/);
+            const handle = handleMatch ? handleMatch[1] : undefined;
             return {
                 title: `Post by @${handle}`,
                 type: "twitter",
@@ -71,15 +67,57 @@ async function fetchTwitterMetadata(url: string): Promise<Metadata | null> {
             };
         }
 
-        const html = await response.text();
-        const metadata = parseOGTags(html);
+        const data = await response.json();
+
+        // Extract handle from author_url
+        const handleMatch = data.author_url.match(/(?:twitter\.com|x\.com)\/(@?[\w]+)/);
+        const handle = handleMatch ? handleMatch[1] : undefined;
+
+        // Clean up title/description from html (oEmbed returns HTML blockquote)
+        // We'll use the author_name and handle for the title if can't extract cleanly
 
         return {
-            title: metadata.title || `Post by @${handle}`,
-            description: metadata.description,
-            thumbnailUrl: metadata.image,
+            title: `Post by ${data.author_name}`,
+            description: "View on X", // oEmbed doesn't give clean text, just HTML
+            authorName: data.author_name,
             authorHandle: handle ? `@${handle}` : undefined,
             type: "twitter",
+            // Twitter oEmbed doesn't provide a thumbnail image directly easily without parsing HTML
+        };
+    } catch {
+        return null;
+    }
+}
+
+// Fetch Reddit metadata using their public JSON API
+async function fetchRedditMetadata(url: string): Promise<Metadata | null> {
+    try {
+        // Ensure URL ends with .json to get JSON data
+        // Clean URL first
+        let jsonUrl = url.split("?")[0];
+        if (jsonUrl.endsWith("/")) jsonUrl = jsonUrl.slice(0, -1);
+        if (!jsonUrl.endsWith(".json")) jsonUrl += ".json";
+
+        const response = await fetch(jsonUrl, {
+            headers: {
+                "User-Agent": "Mozilla/5.0 (VibeStackBot/1.0)",
+            },
+        });
+
+        if (!response.ok) return null;
+
+        const data = await response.json();
+        const post = data[0]?.data?.children[0]?.data;
+
+        if (!post) return null;
+
+        return {
+            title: post.title,
+            description: post.selftext || `Discussion on r/${post.subreddit}`,
+            thumbnailUrl: (post.thumbnail && post.thumbnail.startsWith("http")) ? post.thumbnail : undefined,
+            authorName: `u/${post.author}`,
+            authorHandle: `r/${post.subreddit}`,
+            type: "reddit",
         };
     } catch {
         return null;
@@ -100,11 +138,21 @@ async function fetchArticleMetadata(url: string): Promise<Metadata | null> {
         const html = await response.text();
         const metadata = parseOGTags(html);
 
+        // Detect source from URL or site_name
+        let source = metadata.author || "Article"; // Default source fallback
+        if (url.includes("medium.com")) source = "Medium";
+        else if (url.includes("substack.com")) source = "Substack";
+        else if (url.includes("dev.to")) source = "Dev.to";
+        else if (url.includes("hashnode.dev")) source = "Hashnode";
+        else if (url.includes("twitter.com") || url.includes("x.com")) source = "X Article";
+
         return {
             title: metadata.title,
             description: metadata.description,
             thumbnailUrl: metadata.image,
-            authorName: metadata.author,
+            authorName: source === "Medium" || source === "Substack" ? metadata.author : undefined, // Medium/Substack often have author in og:author
+            // We pass the source for the UI to display
+            authorHandle: source, // HACK: We'll use authorHandle field to transport 'source' string temporarily if strict types
             type: "article",
         };
     } catch {
@@ -152,14 +200,19 @@ function parseOGTags(html: string): {
         title,
         description: getMetaContent("description"),
         image: getMetaContent("image"),
-        author: getMetaContent("author") || getMetaContent("site_name"),
+        author: getMetaContent("site_name"),
     };
 }
 
 // Detect URL type
-function detectUrlType(url: string): "youtube" | "twitter" | "article" {
+function detectUrlType(url: string): "youtube" | "twitter" | "reddit" | "article" {
     if (/youtube\.com|youtu\.be/.test(url)) return "youtube";
-    if (/twitter\.com|x\.com/.test(url)) return "twitter";
+    if (/twitter\.com|x\.com/.test(url)) {
+        // Check if it's an article (e.g. /article/ or specific path? X articles are tricky URLs, usually just posts)
+        // For now, assume all x.com are twitter types unless we find a specific pattern
+        return "twitter";
+    }
+    if (/reddit\.com/.test(url)) return "reddit";
     return "article";
 }
 
@@ -186,6 +239,9 @@ export async function GET(request: NextRequest) {
             break;
         case "twitter":
             metadata = await fetchTwitterMetadata(url);
+            break;
+        case "reddit":
+            metadata = await fetchRedditMetadata(url);
             break;
         case "article":
             metadata = await fetchArticleMetadata(url);

@@ -85,7 +85,7 @@ async function getFeaturedResources() {
       orderBy: {
         viewCount: "desc",
       },
-      take: 8,
+      take: 20,
     });
 
     // Fallback if no featured resources
@@ -97,7 +97,7 @@ async function getFeaturedResources() {
         orderBy: {
           createdAt: "desc"
         },
-        take: 8,
+        take: 20,
       });
     }
 

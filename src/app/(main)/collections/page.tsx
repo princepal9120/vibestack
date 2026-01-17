@@ -2,7 +2,6 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import {
-    PromptsIcon,
     SubAgentsIcon,
     WorkflowsIcon,
     MCPIcon,
@@ -11,21 +10,13 @@ import {
 
 export const metadata: Metadata = {
     title: "Collections | Vibe Stack",
-    description: "Curated prompts, sub-agents, workflows, and MCPs for AI coding",
+    description: "Curated sub-agents, workflows, and MCPs for AI coding",
 };
 
 const collections = [
     {
-        title: "Prompts",
-        description: "Copy-paste ready prompts for coding, debugging, documentation, and more",
-        href: "/collections/prompts",
-        icon: PromptsIcon,
-        count: "50+",
-        gradient: "from-blue-500/20 to-blue-600/10",
-    },
-    {
         title: "Sub-Agents",
-        description: "Role-specific AI agent prompts for React, Python, TypeScript, and more",
+        description: "Role-specific AI agent configurations for React, Python, TypeScript, and more",
         href: "/collections/subagents",
         icon: SubAgentsIcon,
         count: "25+",
@@ -47,6 +38,14 @@ const collections = [
         count: "15+",
         gradient: "from-emerald-500/20 to-emerald-600/10",
     },
+    {
+        title: "Skills",
+        description: "Modular AI capabilities you can compose and customize",
+        href: "/collections/skills",
+        icon: SkillsIcon,
+        count: "40+",
+        gradient: "from-blue-500/20 to-blue-600/10",
+    },
 ];
 
 
@@ -58,7 +57,7 @@ export default function CollectionsPage() {
                 <div className="max-w-2xl">
                     <h1 className="text-4xl font-bold tracking-tight">Collections</h1>
                     <p className="mt-4 text-lg text-muted-foreground">
-                        Your curated library of AI coding knowledge. Browse prompts, discover sub-agents,
+                        Your curated library of AI coding knowledge. Discover sub-agents,
                         learn workflows, and integrate MCPs.
                     </p>
                 </div>

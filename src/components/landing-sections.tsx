@@ -34,6 +34,8 @@ import {
     getPlatformIcon,
 } from "@/components/icons";
 import { ResourceCard } from "@/components/resource-card";
+import { ResourceBentoGrid } from "@/components/resource-bento-grid";
+
 
 
 
@@ -477,6 +479,8 @@ export function CTASection() {
 
 // Resources & Learning Section
 export function ResourcesSection({ resources }: { resources?: any[] }) {
+    if (!resources || resources.length === 0) return null;
+
     return (
         <section className="border-t border-border py-24 bg-muted/20">
             <div className="container">
@@ -501,27 +505,7 @@ export function ResourcesSection({ resources }: { resources?: any[] }) {
                         <ArrowRight className="h-4 w-4" />
                     </Link>
                 </motion.div>
-
-                {resources && resources.length > 0 ? (
-                    <motion.div
-                        initial="hidden"
-                        whileInView="visible"
-                        viewport={{ once: true }}
-                        variants={stagger}
-                        className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
-                    >
-                        {resources.slice(0, 8).map((resource) => (
-                            <motion.div key={resource.id} variants={fadeUp} className="h-full">
-                                <ResourceCard resource={resource} className="h-full" />
-                            </motion.div>
-                        ))}
-                    </motion.div>
-                ) : (
-                    // Fallback to static categories if no resources passed (or loading state)
-                    <div className="text-center py-12 text-muted-foreground">
-                        No resources found. <Link href="/submit/resource" className="text-primary hover:underline">Submit one!</Link>
-                    </div>
-                )}
+                <ResourceBentoGrid resources={resources} />
 
                 <motion.div
                     initial="hidden"
@@ -539,7 +523,7 @@ export function ResourcesSection({ resources }: { resources?: any[] }) {
                     </Link>
                 </motion.div>
             </div>
-        </section>
+        </section >
     );
 }
 

@@ -15,7 +15,6 @@ import {
 } from "lucide-react";
 import {
     SkillsIcon,
-    PromptsIcon,
     SubAgentsIcon,
     WorkflowsIcon,
     MCPIcon
@@ -29,10 +28,9 @@ const navItems = [
     { href: "/projects", label: "Projects" },
 ];
 
-// Collections dropdown items
+// Collections dropdown items (without Prompts)
 const collectionsItems = [
     { href: "/collections/skills", label: "Skills", icon: SkillsIcon, description: "Modular AI capabilities" },
-    { href: "/collections/prompts", label: "Prompts", icon: PromptsIcon, description: "Copy-paste ready prompts" },
     { href: "/collections/subagents", label: "Sub-Agents", icon: SubAgentsIcon, description: "Role-specific AI agents" },
     { href: "/collections/workflows", label: "Workflows", icon: WorkflowsIcon, description: "Best practices & guides" },
     { href: "/collections/mcps", label: "MCPs", icon: MCPIcon, description: "Model Context Protocol" },
