@@ -7,11 +7,13 @@ import {
     Play,
     User,
     ExternalLink,
-    BookOpen,
-    FileText,
-    MessageCircle,
-    Video,
 } from "lucide-react";
+import {
+    ResourcesIcon,
+    YouTubeIcon,
+    GuidesIcon,
+    XIcon
+} from "@/components/icons";
 
 export const metadata: Metadata = {
     title: "Resources | Vibe Stack",
@@ -19,12 +21,13 @@ export const metadata: Metadata = {
 };
 
 const CATEGORIES = [
-    { value: "", label: "All Resources", icon: BookOpen },
-    { value: "youtube", label: "YouTube Videos", icon: Video },
-    { value: "blog", label: "Blog Posts", icon: FileText },
-    { value: "tutorial", label: "Tutorials", icon: BookOpen },
-    { value: "social", label: "Social Posts", icon: MessageCircle },
+    { value: "", label: "All Resources", icon: ResourcesIcon },
+    { value: "youtube", label: "YouTube Videos", icon: YouTubeIcon },
+    { value: "blog", label: "Blog Posts", icon: ResourcesIcon },
+    { value: "tutorial", label: "Tutorials", icon: GuidesIcon },
+    { value: "social", label: "Social Posts", icon: XIcon },
 ];
+
 
 const TYPE_CONFIG: Record<string, { color: string; bgColor: string }> = {
     youtube: { color: "text-red-400", bgColor: "bg-red-500/10" },
@@ -98,7 +101,7 @@ function YouTubeCard({ resource }: { resource: { id: string; title: string; desc
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-red-500/20 to-red-600/10">
-                        <Video className="h-12 w-12 text-red-400" />
+                        <YouTubeIcon className="h-12 w-12 text-red-400" />
                     </div>
                 )}
 
@@ -153,7 +156,7 @@ function BlogCard({ resource }: { resource: { id: string; title: string; descrip
         <div className="group relative flex gap-4 p-4 rounded-xl border border-border bg-card transition-all hover:shadow-lg hover:shadow-primary/5 hover:border-primary/30">
             {/* Icon */}
             <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                <FileText className="h-5 w-5 text-blue-400" />
+                <ResourcesIcon className="h-5 w-5 text-blue-400" />
             </div>
 
             {/* Content */}
@@ -216,7 +219,7 @@ async function ResourcesList({ searchParams }: { searchParams: ResourcesPageProp
         return (
             <div className="text-center py-20">
                 <div className="mx-auto w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mb-4">
-                    <BookOpen className="h-8 w-8 text-muted-foreground" />
+                    <ResourcesIcon className="h-8 w-8 text-muted-foreground" />
                 </div>
                 <h3 className="text-lg font-semibold mb-2">No resources found</h3>
                 <p className="text-muted-foreground text-sm">

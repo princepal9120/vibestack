@@ -9,15 +9,17 @@ import {
     X,
     Sparkles,
     ChevronDown,
-    MessageSquare,
-    Zap,
-    Users,
-    Server,
     Plus,
     Rocket,
     FileText,
-    Wand2,
 } from "lucide-react";
+import {
+    SkillsIcon,
+    PromptsIcon,
+    SubAgentsIcon,
+    WorkflowsIcon,
+    MCPIcon
+} from "@/components/icons";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -28,12 +30,13 @@ const navItems = [
 
 // Collections dropdown items
 const collectionsItems = [
-    { href: "/collections/skills", label: "Skills", icon: Wand2, description: "Modular AI capabilities" },
-    { href: "/collections/prompts", label: "Prompts", icon: MessageSquare, description: "Copy-paste ready prompts" },
-    { href: "/collections/subagents", label: "Sub-Agents", icon: Users, description: "Role-specific AI agents" },
-    { href: "/collections/workflows", label: "Workflows", icon: Zap, description: "Best practices & guides" },
-    { href: "/collections/mcps", label: "MCPs", icon: Server, description: "Model Context Protocol" },
+    { href: "/collections/skills", label: "Skills", icon: SkillsIcon, description: "Modular AI capabilities" },
+    { href: "/collections/prompts", label: "Prompts", icon: PromptsIcon, description: "Copy-paste ready prompts" },
+    { href: "/collections/subagents", label: "Sub-Agents", icon: SubAgentsIcon, description: "Role-specific AI agents" },
+    { href: "/collections/workflows", label: "Workflows", icon: WorkflowsIcon, description: "Best practices & guides" },
+    { href: "/collections/mcps", label: "MCPs", icon: MCPIcon, description: "Model Context Protocol" },
 ];
+
 
 const rightNavItems = [
     { href: "/platforms", label: "Platforms" },
@@ -72,18 +75,26 @@ export function Navbar() {
                 <div className="hidden md:flex md:items-center md:gap-1">
                     {/* Projects */}
                     {navItems.map((item) => (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className={cn(
-                                "px-4 py-2 text-sm font-medium rounded-lg transition-colors hover:bg-accent",
-                                pathname.startsWith(item.href)
-                                    ? "text-primary bg-primary/5"
-                                    : "text-muted-foreground"
+                        <div className="relative" key={item.href}>
+                            {pathname.startsWith(item.href) && (
+                                <motion.div
+                                    layoutId="navbar-active"
+                                    className="absolute inset-0 rounded-lg bg-primary/10"
+                                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                />
                             )}
-                        >
-                            {item.label}
-                        </Link>
+                            <Link
+                                href={item.href}
+                                className={cn(
+                                    "relative z-10 block px-4 py-2 text-sm font-medium transition-colors hover:text-primary",
+                                    pathname.startsWith(item.href)
+                                        ? "text-primary"
+                                        : "text-muted-foreground"
+                                )}
+                            >
+                                {item.label}
+                            </Link>
+                        </div>
                     ))}
 
                     {/* Collections Dropdown */}

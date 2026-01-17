@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -213,28 +214,30 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                         <h3 className="font-semibold">Links</h3>
                         <div className="space-y-3">
                             {project.githubUrl && (
-                                <a
-                                    href={project.githubUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-                                >
-                                    <Github className="h-4 w-4" />
-                                    View on GitHub
-                                    <ExternalLink className="h-3 w-3 ml-auto" />
-                                </a>
+                                <Button asChild variant="outline" className="w-full justify-start">
+                                    <a
+                                        href={project.githubUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        <Github className="mr-2 h-4 w-4" />
+                                        View on GitHub
+                                        <ExternalLink className="h-3 w-3 ml-auto opacity-50" />
+                                    </a>
+                                </Button>
                             )}
                             {project.liveUrl && (
-                                <a
-                                    href={project.liveUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-                                >
-                                    <ExternalLink className="h-4 w-4" />
-                                    Live Demo
-                                    <ExternalLink className="h-3 w-3 ml-auto" />
-                                </a>
+                                <Button asChild variant="glow" className="w-full justify-start">
+                                    <a
+                                        href={project.liveUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        <ExternalLink className="mr-2 h-4 w-4" />
+                                        Live Demo
+                                        <ExternalLink className="h-3 w-3 ml-auto opacity-50" />
+                                    </a>
+                                </Button>
                             )}
                         </div>
                     </div>

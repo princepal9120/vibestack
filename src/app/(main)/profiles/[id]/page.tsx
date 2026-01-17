@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { ExternalLink, CheckCircle2 } from "lucide-react";
+import { getPlatformIcon } from "@/components/icons";
 
 interface ProfilePageProps {
     params: Promise<{ id: string }>;
@@ -35,25 +36,33 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
         notFound();
     }
 
+    const Icon = getPlatformIcon(profile.platformId);
+
     return (
         <div className="container max-w-4xl py-8">
             {/* Header */}
-            <div className="mb-8">
-                <h1 className="text-4xl font-bold tracking-tight">{profile.name}</h1>
-                {profile.tagline && (
-                    <p className="mt-2 text-xl text-muted-foreground">{profile.tagline}</p>
-                )}
-                {profile.websiteUrl && (
-                    <a
-                        href={profile.websiteUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-4 inline-flex items-center gap-2 text-sm text-primary hover:underline"
-                    >
-                        Visit Website <ExternalLink className="h-3 w-3" />
-                    </a>
-                )}
+            <div className="mb-8 flex items-start gap-6">
+                <div className="h-20 w-20 flex-shrink-0 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                    <Icon className="h-10 w-10" />
+                </div>
+                <div>
+                    <h1 className="text-4xl font-bold tracking-tight">{profile.name}</h1>
+                    {profile.tagline && (
+                        <p className="mt-2 text-xl text-muted-foreground">{profile.tagline}</p>
+                    )}
+                    {profile.websiteUrl && (
+                        <a
+                            href={profile.websiteUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mt-4 inline-flex items-center gap-2 text-sm text-primary hover:underline"
+                        >
+                            Visit Website <ExternalLink className="h-3 w-3" />
+                        </a>
+                    )}
+                </div>
             </div>
+
 
             {/* Description */}
             <div className="prose prose-neutral dark:prose-invert max-w-none mb-12">

@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -55,6 +57,8 @@ interface Metadata {
 }
 
 export default function SubmitResourcePage() {
+    const router = useRouter();
+    const { user, isLoaded, isSignedIn } = useUser();
     const [step, setStep] = useState<"type" | "details" | "success">("type");
     const [selectedType, setSelectedType] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -69,6 +73,30 @@ export default function SubmitResourcePage() {
         authorHandle: "",
         thumbnailUrl: "",
     });
+
+    // Redirect to sign-in if not authenticated
+    if (isLoaded && !isSignedIn) {
+        return (
+            <div className="min-h-screen bg-background flex items-center justify-center p-4">
+                <div className="max-w-md w-full text-center space-y-6 p-8 rounded-2xl border border-border bg-card">
+                    <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                        <Sparkles className="h-8 w-8 text-primary" />
+                    </div>
+                    <h1 className="text-2xl font-bold">Sign in to Submit</h1>
+                    <p className="text-muted-foreground">
+                        Create an account or sign in to share a resource with the community.
+                    </p>
+                    <button
+                        onClick={() => router.push("/sign-in?redirect_url=/submit/resource")}
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 text-base font-semibold text-primary-foreground"
+                    >
+                        Sign In to Continue
+                        <ArrowRight className="h-5 w-5" />
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     const handleTypeSelect = (type: string) => {
         setSelectedType(type);

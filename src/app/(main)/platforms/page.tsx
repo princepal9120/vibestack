@@ -1,20 +1,21 @@
 import Link from "next/link";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
-import { ArrowRight, Code2, FileText, Zap } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import {
+    getPlatformIcon,
+    CursorIcon,
+    ClaudeIcon,
+    ReplitIcon,
+    CopilotIcon,
+    ClineIcon,
+} from "@/components/icons";
 
 export const metadata: Metadata = {
     title: "Platforms",
     description: "Explore AI coding platforms and their workflows",
 };
 
-const platformIcons: Record<string, typeof Code2> = {
-    cursor: Code2,
-    "claude-code": FileText,
-    ramp: Zap,
-    ralph: Code2,
-    "replit-ai": Code2,
-};
 
 export default async function ProfilesPage() {
     const profiles = await prisma.platformProfile.findMany({
@@ -40,7 +41,7 @@ export default async function ProfilesPage() {
                         { id: "github-copilot", name: "GitHub Copilot", tagline: "Your AI pair programmer" },
                         { id: "ramp", name: "Ramp", tagline: "AI coding assistant" },
                     ].map((platform) => {
-                        const Icon = platformIcons[platform.id] || Code2;
+                        const Icon = getPlatformIcon(platform.id);
                         return (
                             <div
                                 key={platform.id}
@@ -75,7 +76,7 @@ export default async function ProfilesPage() {
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {profiles.map((profile) => {
-                    const Icon = platformIcons[profile.platformId] || Code2;
+                    const Icon = getPlatformIcon(profile.platformId);
                     return (
                         <Link
                             key={profile.id}

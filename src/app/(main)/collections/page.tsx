@@ -1,6 +1,13 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { MessageSquare, Users, Zap, Server, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import {
+    PromptsIcon,
+    SubAgentsIcon,
+    WorkflowsIcon,
+    MCPIcon,
+    SkillsIcon,
+} from "@/components/icons";
 
 export const metadata: Metadata = {
     title: "Collections | Vibe Stack",
@@ -12,7 +19,7 @@ const collections = [
         title: "Prompts",
         description: "Copy-paste ready prompts for coding, debugging, documentation, and more",
         href: "/collections/prompts",
-        icon: MessageSquare,
+        icon: PromptsIcon,
         count: "50+",
         gradient: "from-blue-500/20 to-blue-600/10",
     },
@@ -20,7 +27,7 @@ const collections = [
         title: "Sub-Agents",
         description: "Role-specific AI agent prompts for React, Python, TypeScript, and more",
         href: "/collections/subagents",
-        icon: Users,
+        icon: SubAgentsIcon,
         count: "25+",
         gradient: "from-purple-500/20 to-purple-600/10",
     },
@@ -28,7 +35,7 @@ const collections = [
         title: "Workflows",
         description: "Best practices, setup guides, and productivity hacks for AI tools",
         href: "/collections/workflows",
-        icon: Zap,
+        icon: WorkflowsIcon,
         count: "30+",
         gradient: "from-amber-500/20 to-amber-600/10",
     },
@@ -36,11 +43,12 @@ const collections = [
         title: "MCPs",
         description: "Model Context Protocol servers for database, cloud, and productivity integrations",
         href: "/collections/mcps",
-        icon: Server,
+        icon: MCPIcon,
         count: "15+",
         gradient: "from-emerald-500/20 to-emerald-600/10",
     },
 ];
+
 
 export default function CollectionsPage() {
     return (

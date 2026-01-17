@@ -15,7 +15,18 @@ const submitResourceSchema = z.object({
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const validated = submitResourceSchema.parse(body);
+        console.log("[Resource Submit] Received body:", JSON.stringify(body, null, 2));
+
+        const result = submitResourceSchema.safeParse(body);
+        if (!result.success) {
+            console.log("[Resource Submit] Validation errors:", JSON.stringify(result.error.issues, null, 2));
+            return NextResponse.json(
+                { error: "Invalid data", details: result.error.issues },
+                { status: 400 }
+            );
+        }
+
+        const validated = result.data;
 
         // Check for duplicate URL
         const existing = await prisma.resource.findFirst({
@@ -36,7 +47,7 @@ export async function POST(request: NextRequest) {
                 url: validated.url,
                 description: validated.description || "",
                 type: validated.type,
-                thumbnailUrl: validated.thumbnailUrl || null,
+                thumbnail: validated.thumbnailUrl || null,
                 author: validated.authorName || validated.authorHandle || null,
                 source: validated.authorName || "Community",
                 // Status defaults to PENDING in schema

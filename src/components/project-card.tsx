@@ -1,4 +1,4 @@
-"use client";
+import { UpvoteButton } from "@/components/upvote-button";
 
 import Link from "next/link";
 import Image from "next/image";
@@ -108,7 +108,7 @@ export function ProjectCard({ project, className, variant = "list" }: ProjectCar
             </Link>
 
             {/* Upvote Button - ProductHunt style */}
-            <UpvoteButton projectId={project.id} count={project.upvoteCount} />
+            <UpvoteButton projectId={project.id} initialCount={project.upvoteCount} orientation="vertical" />
         </motion.div>
     );
 }
@@ -215,21 +215,6 @@ function GridProjectCard({ project, className }: { project: ProjectCardProps["pr
     );
 }
 
-// Upvote button component - ProductHunt style vertical pill
-function UpvoteButton({ projectId, count }: { projectId: string; count: number }) {
-    return (
-        <button
-            className="shrink-0 flex flex-col items-center justify-center rounded-lg border-2 border-border bg-card px-3 py-2 min-w-[60px] transition-all hover:border-primary hover:bg-primary/10 group/upvote"
-            onClick={(e) => {
-                e.preventDefault();
-                // TODO: Implement upvote API call
-                console.log("Upvote project:", projectId);
-            }}
-        >
-            <ArrowUp className="h-5 w-5 text-muted-foreground group-hover/upvote:text-primary transition-colors" />
-            <span className="text-sm font-semibold text-foreground mt-0.5">{count}</span>
-        </button>
-    );
-}
+// Upvote Button is now imported from @/components/upvote-button
 
 export { GridProjectCard };

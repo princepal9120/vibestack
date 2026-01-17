@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Sparkles, Github, Twitter } from "lucide-react";
+import { Sparkles } from "lucide-react";
+import { GitHubIcon, XIcon } from "@/components/icons";
 
 const footerLinks = {
     product: [
@@ -40,7 +41,7 @@ export function Footer() {
                                 rel="noopener noreferrer"
                                 className="text-muted-foreground hover:text-foreground transition-colors"
                             >
-                                <Github className="h-5 w-5" />
+                                <GitHubIcon className="h-5 w-5" />
                             </a>
                             <a
                                 href="https://twitter.com"
@@ -48,7 +49,7 @@ export function Footer() {
                                 rel="noopener noreferrer"
                                 className="text-muted-foreground hover:text-foreground transition-colors"
                             >
-                                <Twitter className="h-5 w-5" />
+                                <XIcon className="h-5 w-5" />
                             </a>
                         </div>
                     </div>

@@ -1,5 +1,6 @@
-import { Suspense } from "react";
+import { Button } from "@/components/ui/button";
 import { Metadata } from "next";
+import { Suspense } from "react";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { ProjectCard } from "@/components/project-card";
@@ -94,12 +95,11 @@ async function ProjectsGrid({
                 <p className="text-sm text-muted-foreground mt-2">
                     Try adjusting your filters or search terms
                 </p>
-                <Link
-                    href="/projects/new"
-                    className="mt-6 inline-flex h-10 items-center justify-center rounded-lg bg-primary px-6 text-sm font-medium text-primary-foreground"
-                >
-                    Be the first to submit
-                </Link>
+                <Button asChild className="mt-6">
+                    <Link href="/projects/new">
+                        Be the first to submit
+                    </Link>
+                </Button>
             </div>
         );
     }
@@ -135,18 +135,16 @@ async function ProjectsGrid({
                         searchParamsObj.set("page", p.toString());
 
                         return (
-                            <a
+                            <Button
                                 key={p}
-                                href={`/projects?${searchParamsObj.toString()}`}
-                                className={cn(
-                                    "inline-flex h-10 w-10 items-center justify-center rounded-lg border text-sm font-medium transition-colors",
-                                    p === pageNum
-                                        ? "bg-primary text-primary-foreground border-primary"
-                                        : "bg-card border-border hover:bg-accent"
-                                )}
+                                asChild
+                                variant={p === pageNum ? "default" : "outline"}
+                                className={cn("w-10 h-10 p-0", p === pageNum ? "pointer-events-none" : "")}
                             >
-                                {p}
-                            </a>
+                                <a href={`/projects?${searchParamsObj.toString()}`}>
+                                    {p}
+                                </a>
+                            </Button>
                         );
                     })}
                     {totalPages > 5 && (
