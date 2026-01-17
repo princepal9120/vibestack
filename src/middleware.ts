@@ -5,7 +5,6 @@ const isProtectedRoute = createRouteMatcher([
     "/projects/new(.*)",
     "/submit/(.*)",
     "/api/projects((?!/[^/]+$).*)", // POST to /api/projects
-    "/api/resources/submit(.*)",
     "/api/comments(.*)",
     "/api/upvotes(.*)",
     "/api/users/(.*)",
@@ -20,10 +19,13 @@ const isPublicRoute = createRouteMatcher([
     "/profiles(.*)",
     "/users/(.*)",
     "/collections(.*)",
+    "/resources(.*)",
     "/api/projects(.*)", // GET requests
     "/api/profiles(.*)",
     "/api/webhooks(.*)",
+    "/api/resources/(.*)", // Resource metadata and submit
 ]);
+
 
 export default clerkMiddleware(async (auth, req) => {
     // Protect routes that need authentication

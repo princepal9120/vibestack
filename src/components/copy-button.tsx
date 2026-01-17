@@ -1,25 +1,24 @@
 "use client";
 
-import { Check, Copy } from "lucide-react";
 import { useState } from "react";
+import { Copy, Check } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 interface CopyButtonProps {
-    content: string;
-    small?: boolean;
+    text: string;
+    label?: string;
+    className?: string;
 }
 
-export function CopyButton({ content, small }: CopyButtonProps) {
+export function CopyButton({ text, label = "Copied!", className }: CopyButtonProps) {
     const [copied, setCopied] = useState(false);
 
-    const handleCopy = async (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
+    const handleCopy = async () => {
         try {
-            await navigator.clipboard.writeText(content);
+            await navigator.clipboard.writeText(text);
             setCopied(true);
-            toast.success("Sub-agent prompt copied!", {
+            toast.success(label, {
                 description: "Copied to clipboard",
                 duration: 2000,
             });
@@ -35,15 +34,15 @@ export function CopyButton({ content, small }: CopyButtonProps) {
         <button
             onClick={handleCopy}
             className={cn(
-                "p-2 rounded-lg bg-card/80 border border-border hover:bg-accent transition-colors",
-                small && "p-1.5"
+                "p-2 rounded-lg bg-card border border-border transition-all hover:bg-accent shadow-sm",
+                className
             )}
             title="Copy to clipboard"
         >
             {copied ? (
-                <Check className={cn("h-4 w-4 text-green-500", small && "h-3 w-3")} />
+                <Check className="h-4 w-4 text-emerald-500" />
             ) : (
-                <Copy className={cn("h-4 w-4", small && "h-3 w-3")} />
+                <Copy className="h-4 w-4" />
             )}
         </button>
     );

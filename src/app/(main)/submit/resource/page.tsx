@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import Image from "next/image";
+import { toast } from "sonner";
 import {
     BookOpen,
     FileText,
@@ -181,11 +182,27 @@ export default function SubmitResourcePage() {
                 }),
             });
 
-            if (response.ok) {
-                setStep("success");
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                toast.success("✓ Resource submitted!", {
+                    description: "Your content is now live on Vibe Stack",
+                });
+                router.push("/resources");
+            } else if (response.status === 409) {
+                toast.error("Already submitted", {
+                    description: "This resource has already been added to Vibe Stack",
+                });
+            } else {
+                toast.error("Submission failed", {
+                    description: data.error || "Please try again",
+                });
             }
         } catch (error) {
             console.error("Submission failed:", error);
+            toast.error("Something went wrong", {
+                description: "Please check your connection and try again",
+            });
         } finally {
             setIsSubmitting(false);
         }

@@ -57,6 +57,7 @@ async function getFeaturedProjects() {
 
 export default async function HomePage() {
   const featuredProjects = await getFeaturedProjects();
+  const featuredResources = await getFeaturedResources();
 
   return (
     <div className="dark min-h-screen">
@@ -66,10 +67,43 @@ export default async function HomePage() {
         <FeaturedProjectsSection projects={featuredProjects} />
         <FeaturesSection />
         <PlatformsSection />
-        <ResourcesSection />
+        <ResourcesSection resources={featuredResources} />
         <CTASection />
       </main>
       <Footer />
     </div>
   );
+}
+
+async function getFeaturedResources() {
+  try {
+    const resources = await prisma.resource.findMany({
+      where: {
+        status: "APPROVED",
+        featured: true,
+      },
+      orderBy: {
+        viewCount: "desc",
+      },
+      take: 8,
+    });
+
+    // Fallback if no featured resources
+    if (resources.length === 0) {
+      return prisma.resource.findMany({
+        where: {
+          status: "APPROVED",
+        },
+        orderBy: {
+          createdAt: "desc"
+        },
+        take: 8,
+      });
+    }
+
+    return resources;
+  } catch (error) {
+    console.error("Error fetching featured resources:", error);
+    return [];
+  }
 }

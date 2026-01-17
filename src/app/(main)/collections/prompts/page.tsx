@@ -4,6 +4,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { cn } from "@/lib/utils";
 import { Copy, Sparkles, Code, FileText, Bug, Pencil, MessageSquare, Zap } from "lucide-react";
+import { CopyButton } from "@/components/copy-button";
 
 export const metadata: Metadata = {
     title: "Prompts & Skills | Vibe Stack",
@@ -125,12 +126,11 @@ async function PromptsList({ searchParams }: { searchParams: PromptsPageProps["s
                                 </pre>
 
                                 {/* Copy button */}
-                                <button
-                                    className="absolute top-3 right-3 p-2 rounded-lg bg-card border border-border opacity-0 group-hover:opacity-100 transition-all hover:bg-accent shadow-sm"
-                                    title="Copy prompt"
-                                >
-                                    <Copy className="h-4 w-4" />
-                                </button>
+                                <CopyButton
+                                    text={prompt.prompt}
+                                    label="Prompt copied!"
+                                    className="absolute top-3 right-3 opacity-0 group-hover:opacity-100"
+                                />
                             </div>
 
                             {/* Use Case */}

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Sparkles } from "lucide-react";
 import { GitHubIcon, XIcon } from "@/components/icons";
+import { Logo } from "@/components/logo";
 
 const footerLinks = {
     product: [
@@ -28,7 +29,7 @@ export function Footer() {
                     {/* Brand */}
                     <div className="space-y-4">
                         <Link href="/" className="flex items-center gap-2">
-                            <Sparkles className="h-6 w-6 text-primary" />
+                            <Logo className="h-8 w-8 text-primary" />
                             <span className="text-xl font-bold tracking-tight">Vibe Stack</span>
                         </Link>
                         <p className="text-sm text-muted-foreground">

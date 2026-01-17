@@ -33,6 +33,8 @@ import {
     RooCodeIcon,
     getPlatformIcon,
 } from "@/components/icons";
+import { ResourceCard } from "@/components/resource-card";
+
 
 
 const features = [
@@ -474,85 +476,67 @@ export function CTASection() {
 }
 
 // Resources & Learning Section
-export function ResourcesSection() {
-    const sections = [
-        {
-            title: "Workflows & Rules",
-            description: "Best practices, hacks, and .cursorrules setup guides",
-            href: "/workflows",
-            icon: Workflow,
-            color: "from-blue-500/20 to-blue-500/5",
-        },
-        {
-            title: "Prompts & Skills",
-            description: "Claude skills and prompt templates for any task",
-            href: "/prompts",
-            icon: MessageSquareText,
-            color: "from-purple-500/20 to-purple-500/5",
-        },
-        {
-            title: "Resources",
-            description: "Curated blogs, X posts, and YouTube videos",
-            href: "/resources",
-            icon: BookOpen,
-            color: "from-green-500/20 to-green-500/5",
-        },
-        {
-            title: "End-to-End Guides",
-            description: "Complete journeys from idea to shipped product",
-            href: "/guides",
-            icon: Map,
-            color: "from-orange-500/20 to-orange-500/5",
-        },
-    ];
-
+export function ResourcesSection({ resources }: { resources?: any[] }) {
     return (
-        <section className="border-t border-border py-24">
+        <section className="border-t border-border py-24 bg-muted/20">
             <div className="container">
                 <motion.div
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true }}
                     variants={fadeUp}
-                    className="text-center mb-12"
+                    className="mb-12 flex items-center justify-between"
                 >
-                    <h2 className="text-3xl font-bold tracking-tight">Learn & Level Up</h2>
-                    <p className="mt-4 text-muted-foreground">
-                        Everything you need to master AI-assisted coding
-                    </p>
+                    <div>
+                        <h2 className="text-3xl font-bold tracking-tight">Learn & Level Up</h2>
+                        <p className="mt-2 text-muted-foreground">
+                            Master AI coding with curated tutorials and guides
+                        </p>
+                    </div>
+                    <Link
+                        href="/resources"
+                        className="hidden sm:inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
+                    >
+                        View all resources
+                        <ArrowRight className="h-4 w-4" />
+                    </Link>
                 </motion.div>
+
+                {resources && resources.length > 0 ? (
+                    <motion.div
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                        variants={stagger}
+                        className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
+                    >
+                        {resources.slice(0, 8).map((resource) => (
+                            <motion.div key={resource.id} variants={fadeUp} className="h-full">
+                                <ResourceCard resource={resource} className="h-full" />
+                            </motion.div>
+                        ))}
+                    </motion.div>
+                ) : (
+                    // Fallback to static categories if no resources passed (or loading state)
+                    <div className="text-center py-12 text-muted-foreground">
+                        No resources found. <Link href="/submit/resource" className="text-primary hover:underline">Submit one!</Link>
+                    </div>
+                )}
 
                 <motion.div
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true }}
-                    variants={stagger}
-                    className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"
+                    variants={fadeUp}
+                    className="mt-8 text-center sm:hidden"
                 >
-                    {sections.map((section) => (
-                        <motion.div key={section.href} variants={fadeUp}>
-                            <Link
-                                href={section.href}
-                                className={cn(
-                                    "group block rounded-xl border border-border bg-gradient-to-br p-6 transition-all hover:shadow-lg hover:border-primary/30",
-                                    section.color
-                                )}
-                            >
-                                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-background/50 backdrop-blur">
-                                    <section.icon className="h-6 w-6 text-foreground" />
-                                </div>
-                                <h3 className="font-semibold text-lg group-hover:text-primary transition-colors">
-                                    {section.title}
-                                </h3>
-                                <p className="mt-2 text-sm text-muted-foreground">
-                                    {section.description}
-                                </p>
-                                <div className="mt-4 flex items-center text-sm text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                                    Explore <ArrowRight className="ml-1 h-4 w-4" />
-                                </div>
-                            </Link>
-                        </motion.div>
-                    ))}
+                    <Link
+                        href="/resources"
+                        className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
+                    >
+                        View all resources
+                        <ArrowRight className="h-4 w-4" />
+                    </Link>
                 </motion.div>
             </div>
         </section>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
+import { toast } from "sonner";
 import {
     ArrowRight,
     Loader2,
@@ -101,33 +102,46 @@ export default function SubmitProjectPage() {
         setIsSubmitting(true);
 
         try {
-            // Create FormData for file upload
-            const submitData = new FormData();
-            submitData.append("title", formData.title);
-            submitData.append("tagline", formData.tagline);
-            submitData.append("description", formData.description);
-            submitData.append("demoUrl", formData.demoUrl);
-            submitData.append("repoUrl", formData.repoUrl);
-            submitData.append("platforms", JSON.stringify(formData.platforms));
-            submitData.append("techStack", JSON.stringify(formData.techStack));
-            if (formData.thumbnail) {
-                submitData.append("thumbnail", formData.thumbnail);
-            }
-
+            // Send JSON instead of FormData for simpler handling
             const response = await fetch("/api/projects", {
                 method: "POST",
-                body: submitData,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    title: formData.title,
+                    description: formData.description,
+                    liveUrl: formData.demoUrl || null,
+                    githubUrl: formData.repoUrl || null,
+                    platforms: formData.platforms.map(p => p.toLowerCase().replace(/\s+/g, "-")),
+                    techStack: formData.techStack,
+                    category: "web-app", // Default category
+                }),
             });
 
-            if (response.ok) {
-                setStep("success");
+            const data = await response.json();
+
+            if (response.ok && data.data) {
+                toast.success("🚀 Project launched successfully!", {
+                    description: "Your project is now live on Vibe Stack",
+                });
+                // Redirect to the new project page
+                router.push(`/projects/${data.data.id}`);
+            } else {
+                toast.error("Failed to submit project", {
+                    description: data.error || "Please try again",
+                });
             }
         } catch (error) {
             console.error("Submission failed:", error);
+            toast.error("Something went wrong", {
+                description: "Please check your connection and try again",
+            });
         } finally {
             setIsSubmitting(false);
         }
     };
+
 
     const toggleArrayItem = (array: string[], item: string) => {
         return array.includes(item)

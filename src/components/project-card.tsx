@@ -1,3 +1,5 @@
+"use client";
+
 import { UpvoteButton } from "@/components/upvote-button";
 
 import Link from "next/link";

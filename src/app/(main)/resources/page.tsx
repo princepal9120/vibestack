@@ -14,6 +14,8 @@ import {
     GuidesIcon,
     XIcon
 } from "@/components/icons";
+import { ResourceCard } from "@/components/resource-card";
+
 
 export const metadata: Metadata = {
     title: "Resources | Vibe Stack",
@@ -84,124 +86,6 @@ async function CategorySidebar({ currentType }: { currentType?: string }) {
     );
 }
 
-function YouTubeCard({ resource }: { resource: { id: string; title: string; description: string | null; url: string; thumbnail: string | null; author: string | null } }) {
-    // Extract YouTube video ID for thumbnail
-    const videoId = resource.url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/)?.[1];
-    const thumbnailUrl = resource.thumbnail || (videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null);
-
-    return (
-        <div className="group relative rounded-xl overflow-hidden border border-border bg-card transition-all hover:shadow-xl hover:shadow-primary/5 hover:border-primary/30">
-            {/* Thumbnail */}
-            <div className="relative aspect-video bg-muted overflow-hidden">
-                {thumbnailUrl ? (
-                    <img
-                        src={thumbnailUrl}
-                        alt={resource.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-red-500/20 to-red-600/10">
-                        <YouTubeIcon className="h-12 w-12 text-red-400" />
-                    </div>
-                )}
-
-                {/* Play Button Overlay */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-16 h-16 rounded-full bg-red-500 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                        <Play className="h-8 w-8 text-white ml-1" fill="white" />
-                    </div>
-                </div>
-            </div>
-
-            {/* Content */}
-            <div className="p-4">
-                {/* Author */}
-                {resource.author && (
-                    <div className="flex items-center gap-2 mb-2">
-                        <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center">
-                            <User className="h-3 w-3 text-muted-foreground" />
-                        </div>
-                        <span className="text-xs text-muted-foreground">{resource.author}</span>
-                    </div>
-                )}
-
-                {/* Title */}
-                <h3 className="font-semibold text-sm line-clamp-2 mb-2 group-hover:text-primary transition-colors">
-                    {resource.title}
-                </h3>
-
-                {/* Description */}
-                {resource.description && (
-                    <p className="text-xs text-muted-foreground line-clamp-2">
-                        {resource.description}
-                    </p>
-                )}
-            </div>
-
-            {/* Clickable overlay */}
-            <a
-                href={resource.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="absolute inset-0"
-            >
-                <span className="sr-only">Watch {resource.title}</span>
-            </a>
-        </div>
-    );
-}
-
-function BlogCard({ resource }: { resource: { id: string; title: string; description: string | null; url: string; thumbnail: string | null; author: string | null; source: string | null } }) {
-    return (
-        <div className="group relative flex gap-4 p-4 rounded-xl border border-border bg-card transition-all hover:shadow-lg hover:shadow-primary/5 hover:border-primary/30">
-            {/* Icon */}
-            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                <ResourcesIcon className="h-5 w-5 text-blue-400" />
-            </div>
-
-            {/* Content */}
-            <div className="flex-1 min-w-0">
-                {/* Source */}
-                {resource.source && (
-                    <span className="text-xs text-muted-foreground">{resource.source}</span>
-                )}
-
-                {/* Title */}
-                <h3 className="font-semibold text-sm line-clamp-2 group-hover:text-primary transition-colors">
-                    {resource.title}
-                </h3>
-
-                {/* Description */}
-                {resource.description && (
-                    <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
-                        {resource.description}
-                    </p>
-                )}
-
-                {/* Author */}
-                {resource.author && (
-                    <div className="flex items-center gap-2 mt-2">
-                        <div className="w-5 h-5 rounded-full bg-muted flex items-center justify-center">
-                            <User className="h-2.5 w-2.5 text-muted-foreground" />
-                        </div>
-                        <span className="text-xs text-muted-foreground">{resource.author}</span>
-                    </div>
-                )}
-            </div>
-
-            {/* External Link */}
-            <a
-                href={resource.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="absolute inset-0"
-            >
-                <span className="sr-only">Read {resource.title}</span>
-            </a>
-        </div>
-    );
-}
-
 async function ResourcesList({ searchParams }: { searchParams: ResourcesPageProps["searchParams"] }) {
     const params = await searchParams;
     const { type } = params;
@@ -242,7 +126,7 @@ async function ResourcesList({ searchParams }: { searchParams: ResourcesPageProp
             <div className="flex-1">
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {youtubeResources.map((resource) => (
-                        <YouTubeCard key={resource.id} resource={resource} />
+                        <ResourceCard key={resource.id} resource={resource} />
                     ))}
                 </div>
             </div>
@@ -253,10 +137,12 @@ async function ResourcesList({ searchParams }: { searchParams: ResourcesPageProp
     if (type && type !== "youtube") {
         return (
             <div className="flex-1">
-                <div className="space-y-3">
-                    {otherResources.map((resource) => (
-                        <BlogCard key={resource.id} resource={resource} />
-                    ))}
+                <div className="space-y-4">
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                        {otherResources.map((resource) => (
+                            <ResourceCard key={resource.id} resource={resource} />
+                        ))}
+                    </div>
                 </div>
             </div>
         );
@@ -271,7 +157,7 @@ async function ResourcesList({ searchParams }: { searchParams: ResourcesPageProp
                     <h2 className="text-xl font-bold mb-4">Featured Videos</h2>
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         {youtubeResources.slice(0, 6).map((resource) => (
-                            <YouTubeCard key={resource.id} resource={resource} />
+                            <ResourceCard key={resource.id} resource={resource} />
                         ))}
                     </div>
                 </section>
@@ -281,9 +167,9 @@ async function ResourcesList({ searchParams }: { searchParams: ResourcesPageProp
             {otherResources.length > 0 && (
                 <section>
                     <h2 className="text-xl font-bold mb-4">Articles & Tutorials</h2>
-                    <div className="grid gap-3 md:grid-cols-2">
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         {otherResources.map((resource) => (
-                            <BlogCard key={resource.id} resource={resource} />
+                            <ResourceCard key={resource.id} resource={resource} />
                         ))}
                     </div>
                 </section>

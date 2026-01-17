@@ -16,6 +16,7 @@ import {
     ChevronRight,
     Wand2,
 } from "lucide-react";
+import { CopyButton } from "@/components/copy-button";
 
 export const metadata: Metadata = {
     title: "Agent Skills | Vibe Stack",
@@ -200,13 +201,12 @@ async function SkillsList({ searchParams }: { searchParams: SkillsPageProps["sea
                                     </span>
                                 )}
                             </div>
-                            <div className="flex items-center gap-2">
-                                <button
-                                    className="p-2 rounded-lg bg-muted/50 text-muted-foreground opacity-0 group-hover:opacity-100 transition-all hover:bg-accent hover:text-foreground"
-                                    title="Copy instructions"
-                                >
-                                    <Copy className="h-4 w-4" />
-                                </button>
+                            <div className="flex items-center gap-2 relative z-30">
+                                <CopyButton
+                                    text={skill.instructions}
+                                    label="Skill copied!"
+                                    className="opacity-0 group-hover:opacity-100 bg-muted/50"
+                                />
                                 {skill.repoUrl && (
                                     <a
                                         href={skill.repoUrl}

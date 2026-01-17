@@ -20,6 +20,7 @@ import {
     WorkflowsIcon,
     MCPIcon
 } from "@/components/icons";
+import { Logo } from "@/components/logo";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -67,7 +68,7 @@ export function Navbar() {
             <nav className="container flex h-16 items-center justify-between">
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-2">
-                    <Sparkles className="h-6 w-6 text-primary" />
+                    <Logo className="h-8 w-8 text-primary" />
                     <span className="text-xl font-bold tracking-tight">Vibe Stack</span>
                 </Link>
 
