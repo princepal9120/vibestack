@@ -1,6 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
-import { X } from "lucide-react";
+import { useState } from "react";
+import { X, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface TweetCardProps {
@@ -15,6 +18,8 @@ interface TweetCardProps {
 }
 
 export function TweetCard({ author, content, className, href }: TweetCardProps) {
+    const [imageError, setImageError] = useState(false);
+
     const CardContent = (
         <div className={cn(
             "relative overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A] p-6 shadow-sm",
@@ -24,13 +29,18 @@ export function TweetCard({ author, content, className, href }: TweetCardProps) 
             {/* Header */}
             <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
-                    <div className="relative h-10 w-10 overflow-hidden rounded-full border border-white/10">
-                        <Image
-                            src={author.avatar}
-                            alt={author.name}
-                            fill
-                            className="object-cover"
-                        />
+                    <div className="relative h-10 w-10 overflow-hidden rounded-full border border-white/10 bg-zinc-800 flex items-center justify-center">
+                        {!imageError ? (
+                            <Image
+                                src={author.avatar}
+                                alt={author.name}
+                                fill
+                                className="object-cover"
+                                onError={() => setImageError(true)}
+                            />
+                        ) : (
+                            <User className="h-5 w-5 text-zinc-400" />
+                        )}
                     </div>
                     <div>
                         <h3 className="text-sm font-semibold text-white leading-none">

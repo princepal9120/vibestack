@@ -3,14 +3,13 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { cn } from "@/lib/utils";
-import { PlusIcon, SparklesIcon, Tag } from "lucide-react";
+import { PlusIcon, Tag } from "lucide-react";
 
 import {
     ResourcesIcon,
     YouTubeIcon,
     XIcon
 } from "@/components/icons";
-import { ResourceBentoCard } from "@/components/resource-bento-card";
 import { TweetCard } from "@/components/tweet-card";
 import { ResourceCard } from "@/components/resource-card";
 
@@ -206,98 +205,42 @@ async function ResourcesList({ searchParams }: { searchParams: ResourcesPageProp
         );
     }
 
-    // If any filter is active, show grid view
-    if (type || platform) {
-        return (
-            <div className="space-y-4">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground pb-2">
-                    <span>Showing {resources.length} results</span>
-                    {platform && (
-                        <span className="flex items-center gap-1 bg-muted px-2 py-0.5 rounded-md text-foreground text-xs">
-                            <Tag className="h-3 w-3" /> {platform.replace(/-/g, " ")}
-                        </span>
-                    )}
-                </div>
-
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    {resources.map((resource) => {
-                        if (resource.type === "social") {
-                            return (
-                                <TweetCard
-                                    key={resource.id}
-                                    author={{
-                                        name: resource.author || "Unknown",
-                                        handle: resource.source || (resource.author ? `@${resource.author.replace(/\s+/g, '').toLowerCase()}` : "@unknown"),
-                                        avatar: resource.thumbnail || "https://github.com/shadcn.png",
-                                    }}
-                                    content={resource.description || resource.title}
-                                    href={resource.url}
-                                />
-                            );
-                        }
-                        return <ResourceCard key={resource.id} resource={resource} />;
-                    })}
-                </div>
-            </div>
-        );
-    }
-
-    // Bento Grid View (Library Dashboard - no filters)
-    const videos = resources.filter(r => r.type === "youtube");
-    const tweets = resources.filter(r => r.type === "social");
-    const blogs = resources.filter(r => r.type === "blog" || r.type === "article");
-    const official = resources.filter(r => {
-        const author = r.author?.toLowerCase() || "";
-        return author.includes("anthropic") || author.includes("google") || author.includes("openai") || r.tags.includes("official");
-    });
-
+    // Unified Grid View for all states (filtered or not)
     return (
-        <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-[500px]">
-            {/* X Posts / Community Vibe */}
-            <ResourceBentoCard
-                title="X Posts"
-                subtitle="Threads, insights & hot takes"
-                icon={XIcon}
-                resources={tweets}
-                type="social"
-                href="/resources?type=social"
-                className="lg:col-span-1"
-            />
+        <div className="space-y-4">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground pb-2">
+                <span>Showing {resources.length} results</span>
+                {platform && (
+                    <span className="flex items-center gap-1 bg-muted px-2 py-0.5 rounded-md text-foreground text-xs">
+                        <Tag className="h-3 w-3" /> {platform.replace(/-/g, " ")}
+                    </span>
+                )}
+                {type && !platform && (
+                    <span className="flex items-center gap-1 bg-muted px-2 py-0.5 rounded-md text-foreground text-xs">
+                        {CATEGORIES.find(c => c.value === type)?.label}
+                    </span>
+                )}
+            </div>
 
-            {/* Videos */}
-            <ResourceBentoCard
-                title="Videos"
-                subtitle="Tutorials, demos & deep dives"
-                icon={YouTubeIcon}
-                resources={videos}
-                type="youtube"
-                href="/resources?type=youtube"
-                className="lg:col-span-1"
-            />
-
-            {/* Blogs */}
-            <ResourceBentoCard
-                title="Blog Posts"
-                subtitle="Articles, guides & analysis"
-                icon={ResourcesIcon}
-                resources={blogs}
-                type="blog"
-                href="/resources?type=blog"
-                className="lg:col-span-1"
-            />
-
-            {/* Official / Featured Updates */}
-            {official.length > 0 && (
-                <ResourceBentoCard
-                    title="From Anthropic"
-                    subtitle="Official updates & announcements"
-                    icon={SparklesIcon}
-                    resources={official}
-                    type="official"
-                    href="/resources?type=official"
-                    className="lg:col-span-1"
-                />
-            )}
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {resources.map((resource) => {
+                    if (resource.type === "social") {
+                        return (
+                            <TweetCard
+                                key={resource.id}
+                                author={{
+                                    name: resource.author || "Unknown",
+                                    handle: resource.source || (resource.author ? `@${resource.author.replace(/\s+/g, '').toLowerCase()}` : "@unknown"),
+                                    avatar: resource.thumbnail || "https://github.com/shadcn.png",
+                                }}
+                                content={resource.description || resource.title}
+                                href={resource.url}
+                            />
+                        );
+                    }
+                    return <ResourceCard key={resource.id} resource={resource} />;
+                })}
+            </div>
         </div>
     );
 }

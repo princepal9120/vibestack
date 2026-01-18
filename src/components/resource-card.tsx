@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useState } from "react";
 import { Play, User, ExternalLink, MessageCircle, ThumbsUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { YouTubeIcon, ResourcesIcon } from "@/components/icons";
@@ -25,6 +26,7 @@ interface ResourceCardProps {
 }
 
 export function ResourceCard({ resource, className }: ResourceCardProps) {
+    const [imageError, setImageError] = useState(false);
     const isVideo = resource.type === "youtube";
     const isBlog = resource.type === "blog" || resource.type === "article";
 
@@ -52,12 +54,13 @@ export function ResourceCard({ resource, className }: ResourceCardProps) {
             <a href={resource.url} target="_blank" rel="noopener noreferrer" className="block h-full flex flex-col">
                 {/* Thumbnail Section */}
                 <div className="relative aspect-video bg-muted overflow-hidden">
-                    {thumbnail ? (
+                    {thumbnail && !imageError ? (
                         <Image
                             src={thumbnail}
                             alt={resource.title}
                             fill
                             className="object-cover transition-transform duration-500 group-hover:scale-105"
+                            onError={() => setImageError(true)}
                         />
                     ) : (
                         <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/5">
