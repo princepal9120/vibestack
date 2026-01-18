@@ -1,163 +1,91 @@
+// Search API Endpoint
+// Fuse.js fuzzy search with facets and highlighting
+
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import Fuse from "fuse.js";
+import { z } from "zod";
+import { search } from "@/lib/search/fuse-search";
+import {
+    ENTITY_TYPES,
+    type SearchResponse,
+    type SearchQuery,
+} from "@/lib/search/types";
 
-interface SearchItem {
-    id: string;
-    type: "resource" | "project" | "platform" | "skill" | "subagent" | "mcp";
-    title: string;
-    description?: string;
-    url: string;
-    category?: string;
-    platform?: string;
-}
-
-// Configure Fuse.js options for fuzzy search
-const fuseOptions = {
-    includeScore: true,
-    threshold: 0.4, // Lower = more strict matching
-    keys: ["title", "description", "category"],
-    minMatchCharLength: 2,
-};
+// Query validation schema
+const SearchQuerySchema = z.object({
+    q: z.string().min(2, "Query must be at least 2 characters").max(200),
+    type: z.enum(ENTITY_TYPES as readonly [string, ...string[]]).optional(),
+    platform: z.string().optional(),
+    category: z.string().optional(),
+    sort: z.enum(["relevance", "recent", "popular"]).optional().default("relevance"),
+    page: z.coerce.number().min(1).max(100).optional().default(1),
+    limit: z.coerce.number().min(1).max(50).optional().default(20),
+});
 
 export async function GET(request: NextRequest) {
+    const startTime = Date.now();
+
     try {
         const searchParams = request.nextUrl.searchParams;
-        const query = searchParams.get("q")?.trim() || "";
 
-        if (!query || query.length < 2) {
-            return NextResponse.json({ results: [] });
+        // Parse and validate query parameters
+        const params = {
+            q: searchParams.get("q") || "",
+            type: searchParams.get("type") || undefined,
+            platform: searchParams.get("platform") || undefined,
+            category: searchParams.get("category") || undefined,
+            sort: searchParams.get("sort") || "relevance",
+            page: searchParams.get("page") || "1",
+            limit: searchParams.get("limit") || "20",
+        };
+
+        const validation = SearchQuerySchema.safeParse(params);
+        if (!validation.success) {
+            return NextResponse.json(
+                {
+                    error: "Invalid query parameters",
+                    details: validation.error.flatten().fieldErrors,
+                    results: [],
+                },
+                { status: 400 }
+            );
         }
 
-        // Fetch all searchable items from database in parallel
-        const [resources, projects, platforms, skills, subAgents, mcps] = await Promise.all([
-            prisma.resource.findMany({
-                where: { status: "APPROVED" },
-                select: {
-                    id: true,
-                    title: true,
-                    description: true,
-                    type: true,
-                    platform: true,
-                },
-                take: 100,
-            }),
-            prisma.project.findMany({
-                select: {
-                    id: true,
-                    title: true,
-                    description: true,
-                    techStack: true,
-                },
-                take: 50,
-            }),
-            prisma.platformProfile.findMany({
-                select: {
-                    id: true,
-                    platformId: true,
-                    name: true,
-                    tagline: true,
-                },
-            }),
-            prisma.skill.findMany({
-                select: {
-                    id: true,
-                    slug: true,
-                    name: true,
-                    tagline: true,
-                    category: true,
-                },
-            }),
-            prisma.subAgent.findMany({
-                select: {
-                    id: true,
-                    slug: true,
-                    name: true,
-                    role: true,
-                    category: true,
-                },
-            }),
-            prisma.mCPServer.findMany({
-                select: {
-                    id: true,
-                    slug: true,
-                    name: true,
-                    description: true,
-                    category: true,
-                },
-            }),
-        ]);
+        const query: SearchQuery = validation.data as SearchQuery;
 
-        // Transform to unified search format
-        const searchItems: SearchItem[] = [
-            ...resources.map((r) => ({
-                id: r.id,
-                type: "resource" as const,
-                title: r.title,
-                description: r.description || undefined,
-                url: `/resources?type=${r.type}`,
-                category: r.type,
-                platform: r.platform || undefined,
-            })),
-            ...projects.map((p) => ({
-                id: p.id,
-                type: "project" as const,
-                title: p.title,
-                description: p.description || undefined,
-                url: `/projects/${p.id}`,
-                category: p.techStack?.[0] || undefined,
-            })),
-            ...platforms.map((p) => ({
-                id: p.id,
-                type: "platform" as const,
-                title: p.name,
-                description: p.tagline || undefined,
-                url: `/platforms/${p.platformId}`,
-            })),
-            ...skills.map((s) => ({
-                id: s.id,
-                type: "skill" as const,
-                title: s.name,
-                description: s.tagline || undefined,
-                url: `/collections/skills?category=${s.category}`,
-                category: s.category,
-            })),
-            ...subAgents.map((s) => ({
-                id: s.id,
-                type: "subagent" as const,
-                title: s.name,
-                description: s.role || undefined,
-                url: `/collections/subagents?category=${s.category}`,
-                category: s.category,
-            })),
-            ...mcps.map((m) => ({
-                id: m.id,
-                type: "mcp" as const,
-                title: m.name,
-                description: m.description || undefined,
-                url: `/collections/mcps`,
-                category: m.category || undefined,
-            })),
-        ];
+        // Execute Fuse.js search
+        const searchResult = await search(query);
 
-        // Perform fuzzy search
-        const fuse = new Fuse(searchItems, fuseOptions);
-        const searchResults = fuse.search(query);
+        const response: SearchResponse = {
+            results: searchResult.results,
+            facets: searchResult.facets,
+            meta: {
+                total: searchResult.total,
+                page: query.page || 1,
+                limit: query.limit || 20,
+                totalPages: Math.ceil(searchResult.total / (query.limit || 20)),
+                latency: searchResult.latency,
+                cached: false,
+            },
+        };
 
-        // Return top results sorted by relevance
-        const results = searchResults
-            .slice(0, 20)
-            .map((result) => result.item);
-
-        return NextResponse.json({
-            results,
-            query,
-            total: results.length,
-        });
+        return NextResponse.json(response);
     } catch (error) {
-        console.error("Search error:", error);
+        console.error("[Search API] Error:", error);
+
         return NextResponse.json(
-            { error: "Search failed", results: [] },
+            {
+                error: "Search failed",
+                results: [],
+                facets: { entityType: {}, platform: {}, category: {} },
+                meta: {
+                    total: 0,
+                    page: 1,
+                    limit: 20,
+                    totalPages: 0,
+                    latency: Date.now() - startTime,
+                    cached: false,
+                },
+            },
             { status: 500 }
         );
     }

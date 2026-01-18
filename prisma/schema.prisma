@@ -165,6 +165,27 @@ model PlatformProfile {
   // Best Practices
   bestPractices  String[]  // Array of best practice tips
   
+  // ==========================================================================
+  // AI Capability Metadata (for discovery & comparison)
+  // ==========================================================================
+  
+  // Agent Classification
+  agentType         String    @default("assistive") // "assistive" | "agentic" | "autonomous"
+  contextAwareness  String[]  // ["repo", "terminal", "ci", "docs"]
+  planningAbility   Boolean   @default(false)
+  toolCalling       Boolean   @default(false)
+  memoryType        String    @default("none") // "none" | "session" | "persistent"
+  bestFor           String[]  // ["web-apps", "mobile", "data-science", etc.]
+  
+  // Platform Classification
+  tags              String[]  // ["cli", "ide", "agentic", "open-source", "enterprise"]
+  workflows         String[]  // ["terminal", "editor", "ci", "repo-wide"]
+  
+  // Additional Metadata
+  logoUrl           String?   // Official SVG logo URL
+  pricingTier       String?   // "free", "freemium", "paid", "enterprise"
+  companyName       String?   // Parent company
+  
   // New fields for enhanced content
   prompts     PromptTemplate[]
   

@@ -4,34 +4,55 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import Fuse from "fuse.js";
 import {
     Search,
     FileText,
-    Folder,
-    Code,
+    Rocket,
     Wand2,
     Bot,
     Server,
-    Rocket,
-    ExternalLink,
     CornerDownLeft,
     Loader2,
     Command,
     Layers,
-    Video,
+    BookOpen,
     MessageSquare,
 } from "lucide-react";
 
+// Types matching the new search API response
 interface SearchResult {
     id: string;
-    type: "resource" | "project" | "platform" | "skill" | "subagent" | "mcp";
+    entityType: string;
+    entityId: string;
     title: string;
-    description?: string;
+    description: string;
     url: string;
-    category?: string;
-    platform?: string;
-    icon?: React.ComponentType<{ className?: string }>;
+    category: string | null;
+    platforms: string[];
+    thumbnail: string | null;
+    _score: number;
+    _highlights: {
+        title?: string;
+        description?: string;
+        content?: string;
+    };
+}
+
+interface SearchResponse {
+    results: SearchResult[];
+    facets: {
+        entityType: Record<string, number>;
+        platform: Record<string, number>;
+        category: Record<string, number>;
+    };
+    meta: {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+        latency: number;
+        cached: boolean;
+    };
 }
 
 const TYPE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -41,6 +62,8 @@ const TYPE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = 
     skill: Wand2,
     subagent: Bot,
     mcp: Server,
+    prompt: MessageSquare,
+    guide: BookOpen,
 };
 
 const TYPE_COLORS: Record<string, string> = {
@@ -50,6 +73,8 @@ const TYPE_COLORS: Record<string, string> = {
     skill: "text-amber-400",
     subagent: "text-pink-400",
     mcp: "text-cyan-400",
+    prompt: "text-orange-400",
+    guide: "text-teal-400",
 };
 
 const TYPE_LABELS: Record<string, string> = {
@@ -59,14 +84,47 @@ const TYPE_LABELS: Record<string, string> = {
     skill: "Skill",
     subagent: "Sub-Agent",
     mcp: "MCP",
+    prompt: "Prompt",
+    guide: "Guide",
 };
+
+// Render highlighted text with <mark> tags from Meilisearch
+function HighlightedText({ text, fallback }: { text?: string; fallback: string }) {
+    if (!text || !text.includes("<mark>")) {
+        return <>{fallback}</>;
+    }
+
+    // Parse and render highlighted text safely
+    const parts = text.split(/(<mark>.*?<\/mark>)/g);
+
+    return (
+        <>
+            {parts.map((part, index) => {
+                if (part.startsWith("<mark>") && part.endsWith("</mark>")) {
+                    const highlighted = part.slice(6, -7);
+                    return (
+                        <span
+                            key={index}
+                            className="bg-primary/20 text-primary font-medium px-0.5 rounded"
+                        >
+                            {highlighted}
+                        </span>
+                    );
+                }
+                return part;
+            })}
+        </>
+    );
+}
 
 export function CommandPalette() {
     const [open, setOpen] = React.useState(false);
     const [query, setQuery] = React.useState("");
     const [results, setResults] = React.useState<SearchResult[]>([]);
+    const [facets, setFacets] = React.useState<SearchResponse["facets"] | null>(null);
     const [isLoading, setIsLoading] = React.useState(false);
     const [selectedIndex, setSelectedIndex] = React.useState(0);
+    const [activeFilter, setActiveFilter] = React.useState<string | null>(null);
     const router = useRouter();
     const inputRef = React.useRef<HTMLInputElement>(null);
 
@@ -93,7 +151,9 @@ export function CommandPalette() {
         } else {
             setQuery("");
             setResults([]);
+            setFacets(null);
             setSelectedIndex(0);
+            setActiveFilter(null);
         }
     }, [open]);
 
@@ -101,26 +161,35 @@ export function CommandPalette() {
     React.useEffect(() => {
         if (!query.trim()) {
             setResults([]);
+            setFacets(null);
             return;
         }
 
         const timer = setTimeout(async () => {
             setIsLoading(true);
             try {
-                const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
-                const data = await res.json();
+                const params = new URLSearchParams({ q: query });
+                if (activeFilter) {
+                    params.set("type", activeFilter);
+                }
+
+                const res = await fetch(`/api/search?${params.toString()}`);
+                const data: SearchResponse = await res.json();
+
                 setResults(data.results || []);
+                setFacets(data.facets || null);
                 setSelectedIndex(0);
             } catch (error) {
                 console.error("Search error:", error);
                 setResults([]);
+                setFacets(null);
             } finally {
                 setIsLoading(false);
             }
         }, 200);
 
         return () => clearTimeout(timer);
-    }, [query]);
+    }, [query, activeFilter]);
 
     // Handle keyboard navigation
     const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -145,14 +214,11 @@ export function CommandPalette() {
     const groupedResults = React.useMemo(() => {
         const groups: Record<string, SearchResult[]> = {};
         results.forEach((result) => {
-            if (!groups[result.type]) groups[result.type] = [];
-            groups[result.type].push(result);
+            if (!groups[result.entityType]) groups[result.entityType] = [];
+            groups[result.entityType].push(result);
         });
         return groups;
     }, [results]);
-
-    // Flatten for navigation
-    const flatResults = React.useMemo(() => results, [results]);
 
     return (
         <>
@@ -190,6 +256,37 @@ export function CommandPalette() {
                             ESC
                         </kbd>
                     </div>
+
+                    {/* Filter Chips */}
+                    {facets && query && Object.keys(facets.entityType).length > 1 && (
+                        <div className="flex items-center gap-2 px-4 py-2 border-b border-border overflow-x-auto">
+                            <button
+                                onClick={() => setActiveFilter(null)}
+                                className={cn(
+                                    "text-xs px-2 py-1 rounded-full transition-colors whitespace-nowrap",
+                                    activeFilter === null
+                                        ? "bg-primary text-primary-foreground"
+                                        : "bg-muted text-muted-foreground hover:bg-muted/80"
+                                )}
+                            >
+                                All
+                            </button>
+                            {Object.entries(facets.entityType).map(([type, count]) => (
+                                <button
+                                    key={type}
+                                    onClick={() => setActiveFilter(activeFilter === type ? null : type)}
+                                    className={cn(
+                                        "text-xs px-2 py-1 rounded-full transition-colors whitespace-nowrap",
+                                        activeFilter === type
+                                            ? "bg-primary text-primary-foreground"
+                                            : "bg-muted text-muted-foreground hover:bg-muted/80"
+                                    )}
+                                >
+                                    {TYPE_LABELS[type] || type}s ({count})
+                                </button>
+                            ))}
+                        </div>
+                    )}
 
                     {/* Results */}
                     <div className="max-h-[400px] overflow-y-auto">
@@ -232,9 +329,9 @@ export function CommandPalette() {
                                 <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                                     {TYPE_LABELS[type] || type}s
                                 </div>
-                                {items.slice(0, 5).map((result, index) => {
-                                    const globalIndex = flatResults.indexOf(result);
-                                    const Icon = TYPE_ICONS[result.type] || FileText;
+                                {items.slice(0, 5).map((result) => {
+                                    const globalIndex = results.indexOf(result);
+                                    const Icon = TYPE_ICONS[result.entityType] || FileText;
                                     const isSelected = globalIndex === selectedIndex;
 
                                     return (
@@ -251,18 +348,24 @@ export function CommandPalette() {
                                                 "flex-shrink-0 h-10 w-10 rounded-lg flex items-center justify-center",
                                                 isSelected ? "bg-primary/20" : "bg-muted"
                                             )}>
-                                                <Icon className={cn("h-5 w-5", TYPE_COLORS[result.type])} />
+                                                <Icon className={cn("h-5 w-5", TYPE_COLORS[result.entityType])} />
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <div className={cn(
                                                     "font-medium truncate",
                                                     isSelected ? "text-primary" : "text-foreground"
                                                 )}>
-                                                    {result.title}
+                                                    <HighlightedText
+                                                        text={result._highlights?.title}
+                                                        fallback={result.title}
+                                                    />
                                                 </div>
                                                 {result.description && (
                                                     <div className="text-sm text-muted-foreground truncate">
-                                                        {result.description}
+                                                        <HighlightedText
+                                                            text={result._highlights?.description}
+                                                            fallback={result.description}
+                                                        />
                                                     </div>
                                                 )}
                                             </div>
