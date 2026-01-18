@@ -289,7 +289,7 @@ export function FeaturedProjectsSection({ projects }: { projects: FeaturedProjec
                     variants={stagger}
                     className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
                 >
-                    {projects.slice(0, 6).map((project) => (
+                    {projects.slice(0, 3).map((project) => (
                         <motion.div
                             key={project.id}
                             variants={fadeUp}
