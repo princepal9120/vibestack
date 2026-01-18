@@ -6,6 +6,7 @@ import {
   FeaturedProjectsSection,
   PlatformsSection,
   CTASection,
+  FAQSection,
 } from "@/components/landing-sections";
 import CommunityVibesSection from "@/components/community-vibes-section";
 import { prisma } from "@/lib/prisma";
@@ -83,6 +84,7 @@ export default async function HomePage() {
         <FeaturesSection />
         <PlatformsSection />
         <CommunityVibesSection resources={featuredResources} />
+        <FAQSection />
         <CTASection />
       </main>
       <Footer />

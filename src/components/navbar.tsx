@@ -20,6 +20,9 @@ import {
     MCPIcon
 } from "@/components/icons";
 import { Logo } from "@/components/logo";
+
+1
+import { CommandPalette } from "@/components/command-palette";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -172,6 +175,9 @@ export function Navbar() {
 
                 {/* Auth & Actions */}
                 <div className="flex items-center gap-3">
+                    {/* Global Search */}
+                    <CommandPalette />
+
                     {/* Submit Dropdown */}
                     <div className="relative hidden sm:block group">
                         <button

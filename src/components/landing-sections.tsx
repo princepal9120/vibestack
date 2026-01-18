@@ -1,9 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
     ArrowRight,
@@ -14,13 +14,8 @@ import {
     Zap,
     BookOpen,
     Layers,
-    ExternalLink,
     ThumbsUp,
     MessageCircle,
-    Workflow,
-    MessageSquareText,
-    Plug,
-    Map,
     ChevronDown,
 } from "lucide-react";
 import {
@@ -32,13 +27,8 @@ import {
     WindsurfIcon,
     OpenCodeIcon,
     RooCodeIcon,
-    getPlatformIcon,
 } from "@/components/icons";
-import { ResourceCard } from "@/components/resource-card";
-import { ResourceBentoGrid } from "@/components/resource-bento-grid";
-
-
-
+import { TweetCard } from "@/components/tweet-card";
 
 const features = [
     {
@@ -201,7 +191,7 @@ export function FeaturesSection() {
                         Everything you need to vibe code
                     </h2>
                     <p className="mt-4 text-lg text-muted-foreground">
-                        From learning the basics to showcasing your projects, we've got you
+                        From learning the basics to showcasing your projects, we&apos;ve got you
                         covered.
                     </p>
                 </motion.div>
@@ -459,7 +449,7 @@ export function CTASection() {
                             Ready to share your project?
                         </h2>
                         <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground">
-                            Join the community and showcase what you've built with AI coding
+                            Join the community and showcase what you&apos;ve built with AI coding
                             tools. Get feedback, inspire others, and build your portfolio.
                         </p>
                         <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
@@ -478,14 +468,30 @@ export function CTASection() {
     );
 }
 
-
-import { useState } from "react";
-import { AnimatePresence } from "framer-motion";
-
 const faqs = [
+    {
+        question: "What is Vibe Stack?",
+        answer: "Vibe Stack is the community hub for the AI-assisted coding era. We curate the best projects, workflows, sub-agents, and skills to help you build faster with next-gen tools like Cursor, Claude Code, and OpenCode."
+    },
     {
         question: "What is the difference between subagents vs skills?",
         answer: "Subagents are specialized AI assistants designed to handle complex, multi-step tasks autonomously (like coding a full feature or researching a topic). Skills, on the other hand, are specific capabilities or instructions provided to an agent to perform discrete actions (like reading a file, searching the web, or executing a specific command)."
+    },
+    {
+        question: "What is an MCP Server?",
+        answer: "MCP (Model Context Protocol) is a standard that lets AI tools connect to your external data and tools—like your database (Postgres), issue tracker (GitHub), or design files (Figma). It gives your AI 'hands' to interact with real-world systems securely."
+    },
+    {
+        question: "How do I use the prompts and skills found here?",
+        answer: "For Sub-agents, you typically copy the 'System Prompt' into your AI tool's configuration or chat context. For Skills, you usually place a `SKILL.md` file in a specific directory (e.g., `~/.claude/skills/`) so the AI automatically detects and uses it."
+    },
+    {
+        question: "Can I submit my own resources?",
+        answer: "Yes! We thrive on community contributions. You can submit your projects, custom sub-agent prompts, or handy MCP configurations through our 'Submit' page to share them with thousands of other developers."
+    },
+    {
+        question: "Which platforms do you support?",
+        answer: "We focus on leading AI-native editors and CLIs including Cursor, Claude Code, Windsurf, and OpenCode. However, many prompts and concepts are adaptable to other LLM-based workflows."
     }
 ];
 
@@ -559,6 +565,7 @@ function FAQItem({ question, answer, index }: { question: string; answer: string
     );
 }
 
+const testimonials = [
     {
         author: {
             name: "Prajwal Tomar",
