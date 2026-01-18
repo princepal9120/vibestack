@@ -33,35 +33,47 @@ import { TweetCard } from "@/components/tweet-card";
 const features = [
     {
         icon: BookOpen,
-        title: "Learn AI Coding",
+        title: "Platform Guides",
         description:
-            "Access industry-grade setup guides and workflows for Cursor, Claude Code, and more.",
+            "Comprehensive setup guides, workflows, and cheat sheets for Cursor, Claude Code, Gemini CLI, and more.",
     },
     {
         icon: Layers,
-        title: "Discover Projects",
+        title: "Project Showcase",
         description:
-            "Browse real-world projects built with AI tools. Get inspired by what's possible.",
+            "Browse and submit real-world projects built with AI coding tools. Get inspired by what developers are building.",
     },
     {
-        icon: Users,
-        title: "Join the Community",
+        icon: Code2,
+        title: "Sub-Agents & Skills",
         description:
-            "Share your projects, get feedback, and connect with other AI-assisted developers.",
+            "Discover role-specific AI prompts and modular skills to supercharge your development workflow.",
     },
     {
         icon: Zap,
-        title: "Level Up Fast",
+        title: "MCP Servers",
         description:
-            "Learn proven patterns and prompts that make you productive from day one.",
+            "Explore Model Context Protocol integrations to connect AI tools with your databases, APIs, and services.",
+    },
+    {
+        icon: Users,
+        title: "Open Source Community",
+        description:
+            "100% open source. Contribute resources, submit PRs, and help shape the future of AI-assisted coding.",
+    },
+    {
+        icon: Rocket,
+        title: "Resource Library",
+        description:
+            "Curated blogs, tutorials, YouTube videos, and X threads from the AI coding community.",
     },
 ];
 
 const stats = [
-    { value: "500+", label: "Projects" },
-    { value: "5", label: "Platforms" },
-    { value: "10k+", label: "Developers" },
-    { value: "50k+", label: "Views" },
+    { value: "8+", label: "AI Platforms" },
+    { value: "100+", label: "Resources" },
+    { value: "Open", label: "Source" },
+    { value: "MIT", label: "License" },
 ];
 
 // Fade up animation variants
@@ -104,7 +116,7 @@ export function HeroSection() {
                 className="mb-8 inline-flex items-center gap-2 rounded-full border border-border bg-card/50 px-4 py-2 text-sm font-medium backdrop-blur-sm"
             >
                 <Sparkles className="h-4 w-4 text-primary" />
-                <span className="text-muted-foreground">The community for AI-assisted coding</span>
+                <span className="text-muted-foreground">Open source community for AI-assisted coding</span>
             </motion.div>
 
             {/* Heading */}
@@ -115,8 +127,9 @@ export function HeroSection() {
                 transition={{ duration: 0.5, delay: 0.1 }}
                 className="max-w-4xl text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl"
             >
-                The amazing things people are building with{" "}
-                <span className="text-primary">AI</span>
+                Your hub for{" "}
+                <span className="text-primary">AI coding</span>{" "}
+                tools & community
             </motion.h1>
 
             {/* Subheading */}
@@ -127,7 +140,7 @@ export function HeroSection() {
                 transition={{ duration: 0.5, delay: 0.2 }}
                 className="mt-6 max-w-2xl text-lg text-muted-foreground sm:text-xl"
             >
-                A curated showcase of impressive projects, workflows, and content from the AI coding community.
+                Discover platform guides, projects, sub-agents, skills, and resources for Cursor, Claude Code, Gemini CLI, and more. 100% open source.
             </motion.p>
 
             {/* CTAs */}
@@ -188,11 +201,10 @@ export function FeaturesSection() {
                     className="mx-auto max-w-2xl text-center"
                 >
                     <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-                        Everything you need to vibe code
+                        Everything you need for AI-assisted coding
                     </h2>
                     <p className="mt-4 text-lg text-muted-foreground">
-                        From learning the basics to showcasing your projects, we&apos;ve got you
-                        covered.
+                        From learning your first AI tool to showcasing production projects—we&apos;ve got you covered.
                     </p>
                 </motion.div>
 
@@ -201,7 +213,7 @@ export function FeaturesSection() {
                     whileInView="visible"
                     viewport={{ once: true }}
                     variants={stagger}
-                    className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-4"
+                    className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-3"
                 >
                     {features.map((feature, i) => (
                         <motion.div
@@ -444,19 +456,27 @@ export function CTASection() {
                     >
                         <Rocket className="mx-auto mb-6 h-12 w-12 text-primary" />
                         <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-                            Ready to share your project?
+                            Contribute to VibeStack
                         </h2>
                         <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground">
-                            Join the community and showcase what you&apos;ve built with AI coding
-                            tools. Get feedback, inspire others, and build your portfolio.
+                            VibeStack is 100% open source. Submit your projects, contribute resources, or help improve the platform. Every contribution matters.
                         </p>
                         <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
                             <Link
                                 href="/projects/new"
                                 className="inline-flex h-12 items-center justify-center rounded-lg bg-primary px-8 text-sm font-medium text-primary-foreground shadow-lg glow-primary transition-all hover:opacity-90"
                             >
-                                Submit Your Project
+                                Submit Project
                                 <ArrowRight className="ml-2 h-4 w-4" />
+                            </Link>
+                            <Link
+                                href="https://github.com/princepal9120/vibestack"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex h-12 items-center justify-center rounded-lg border border-border bg-card px-8 text-sm font-medium shadow-sm transition-colors hover:bg-accent"
+                            >
+                                Star on GitHub
+                                <Sparkles className="ml-2 h-4 w-4" />
                             </Link>
                         </div>
                     </motion.div>
@@ -468,28 +488,28 @@ export function CTASection() {
 
 const faqs = [
     {
-        question: "What is Vibe Stack?",
-        answer: "Vibe Stack is the community hub for the AI-assisted coding era. We curate the best projects, workflows, sub-agents, and skills to help you build faster with next-gen tools like Cursor, Claude Code, and OpenCode."
+        question: "What is VibeStack?",
+        answer: "VibeStack is an open-source community platform for AI-assisted coding. We curate platform guides, projects, sub-agents, skills, MCP servers, and resources to help developers build faster with tools like Cursor, Claude Code, Gemini CLI, and more."
     },
     {
-        question: "What is the difference between subagents vs skills?",
-        answer: "Subagents are specialized AI assistants designed to handle complex, multi-step tasks autonomously (like coding a full feature or researching a topic). Skills, on the other hand, are specific capabilities or instructions provided to an agent to perform discrete actions (like reading a file, searching the web, or executing a specific command)."
+        question: "Is VibeStack open source?",
+        answer: "Yes! VibeStack is 100% open source under the MIT license. You can view the code, submit pull requests, report issues, and contribute to the project on GitHub at github.com/princepal9120/vibestack."
+    },
+    {
+        question: "What's the difference between sub-agents and skills?",
+        answer: "Sub-agents are specialized AI personas with detailed system prompts for handling complex tasks (like a 'React Architect' or 'Python Expert'). Skills are modular capabilities—specific instructions that enhance what an AI can do (like reading files, generating docs, or running commands)."
     },
     {
         question: "What is an MCP Server?",
-        answer: "MCP (Model Context Protocol) is a standard that lets AI tools connect to your external data and tools—like your database (Postgres), issue tracker (GitHub), or design files (Figma). It gives your AI 'hands' to interact with real-world systems securely."
+        answer: "MCP (Model Context Protocol) is a standard that lets AI tools connect to external services—databases, APIs, design tools, and more. MCP servers give your AI the ability to interact with real-world systems securely and extend its capabilities."
     },
     {
-        question: "How do I use the prompts and skills found here?",
-        answer: "For Sub-agents, you typically copy the 'System Prompt' into your AI tool's configuration or chat context. For Skills, you usually place a `SKILL.md` file in a specific directory (e.g., `~/.claude/skills/`) so the AI automatically detects and uses it."
+        question: "How can I contribute?",
+        answer: "There are many ways to contribute: submit your AI-built projects, share useful resources (blogs, videos, tutorials), add sub-agents or skills, or contribute to the codebase directly. Check our CONTRIBUTING.md on GitHub for detailed guidelines."
     },
     {
-        question: "Can I submit my own resources?",
-        answer: "Yes! We thrive on community contributions. You can submit your projects, custom sub-agent prompts, or handy MCP configurations through our 'Submit' page to share them with thousands of other developers."
-    },
-    {
-        question: "Which platforms do you support?",
-        answer: "We focus on leading AI-native editors and CLIs including Cursor, Claude Code, Windsurf, and OpenCode. However, many prompts and concepts are adaptable to other LLM-based workflows."
+        question: "Which AI coding platforms are supported?",
+        answer: "We support 8+ platforms including Cursor, Claude Code, Gemini CLI, GitHub Copilot, OpenCode, Roo Code, Replit AI, and Windsurf. Many resources and prompts are adaptable across different AI tools."
     }
 ];
 
