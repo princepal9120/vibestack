@@ -21,6 +21,7 @@ import {
     MessageSquareText,
     Plug,
     Map,
+    ChevronDown,
 } from "lucide-react";
 import {
     CursorIcon,
@@ -478,9 +479,86 @@ export function CTASection() {
 }
 
 
-import { TweetCard } from "@/components/tweet-card";
+import { useState } from "react";
+import { AnimatePresence } from "framer-motion";
 
-const testimonials = [
+const faqs = [
+    {
+        question: "What is the difference between subagents vs skills?",
+        answer: "Subagents are specialized AI assistants designed to handle complex, multi-step tasks autonomously (like coding a full feature or researching a topic). Skills, on the other hand, are specific capabilities or instructions provided to an agent to perform discrete actions (like reading a file, searching the web, or executing a specific command)."
+    }
+];
+
+export function FAQSection() {
+    return (
+        <section className="border-t border-border bg-muted/10 py-24">
+            <div className="container max-w-3xl">
+                <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
+                    variants={fadeUp}
+                    className="mb-12 text-center"
+                >
+                    <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+                        Frequently Asked Questions
+                    </h2>
+                    <p className="mt-4 text-lg text-muted-foreground">
+                        Common questions about Vibe Stack and AI coding tools.
+                    </p>
+                </motion.div>
+
+                <div className="space-y-4">
+                    {faqs.map((faq, i) => (
+                        <FAQItem key={i} question={faq.question} answer={faq.answer} index={i} />
+                    ))}
+                </div>
+            </div>
+        </section>
+    );
+}
+
+function FAQItem({ question, answer, index }: { question: string; answer: string; index: number }) {
+    const [isOpen, setIsOpen] = useState(false);
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: index * 0.1 }}
+            className="rounded-xl border border-border bg-card overflow-hidden"
+        >
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="flex w-full items-center justify-between p-6 text-left transition-colors hover:bg-muted/50"
+            >
+                <span className="text-lg font-medium">{question}</span>
+                <ChevronDown
+                    className={cn(
+                        "h-5 w-5 text-muted-foreground transition-transform duration-200",
+                        isOpen && "rotate-180"
+                    )}
+                />
+            </button>
+            <AnimatePresence initial={false}>
+                {isOpen && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                    >
+                        <div className="px-6 pb-6 pt-0 text-muted-foreground border-t border-border/50 bg-muted/20">
+                            <div className="pt-4">{answer}</div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </motion.div>
+    );
+}
+
     {
         author: {
             name: "Prajwal Tomar",
@@ -531,6 +609,7 @@ const testimonials = [
     }
 ];
 
+
 export function TestimonialsSection() {
     return (
         <section className="border-t border-border bg-black/5 py-24">
@@ -568,3 +647,4 @@ export function TestimonialsSection() {
         </section>
     );
 }
+

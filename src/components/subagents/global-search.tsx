@@ -5,7 +5,6 @@ import { motion } from "motion/react";
 import { Suspense } from "react";
 import { GlobalSearchInput } from "./global-search-input";
 import { HeroTitle } from "./hero-title";
-import { MCPList } from "./mcp-list";
 import { RuleList } from "./rule-list";
 
 export function GlobalSearch({ sections }: { sections: Section[] }) {
@@ -21,15 +20,7 @@ export function GlobalSearch({ sections }: { sections: Section[] }) {
                         </Suspense>
                     </div>
 
-                    <motion.div
-                        className="mb-10"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
-                    >
-                        <MCPList />
-                    </motion.div>
-
+                  
                     <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}

@@ -153,6 +153,18 @@ model PlatformProfile {
   setupGuide  String   @db.Text // Markdown
   cheatSheet  String[] // Array of key points
   
+  // Skills Configuration
+  skillsPath     String?   // e.g., ".claude/skills/<name>/"
+  skillsGuide    String?   @db.Text // How to use skills on this platform
+  
+  // MCP Configuration
+  mcpSupported   Boolean   @default(false)
+  mcpGuide       String?   @db.Text // MCP setup guide for this platform
+  mcpConfigPath  String?   // e.g., "~/.claude.json" or ".mcp.json"
+  
+  // Best Practices
+  bestPractices  String[]  // Array of best practice tips
+  
   // New fields for enhanced content
   prompts     PromptTemplate[]
   

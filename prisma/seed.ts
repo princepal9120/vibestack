@@ -91,6 +91,103 @@ Follow the existing code patterns in this project.
                 "Escape: Cancel current AI operation",
                 "Cmd+Enter: Submit prompt in chat",
             ],
+            // Skills Configuration
+            skillsPath: ".cursor/skills/<name>/",
+            skillsGuide: `# Using Skills in Cursor
+
+## Skills Directory
+Cursor looks for skills in \`.cursor/skills/<name>/\` directories within your project.
+
+## Creating a Skill
+1. Create the directory: \`mkdir -p .cursor/skills/my-skill\`
+2. Add a \`skill.md\` file with instructions
+3. The skill will be automatically available
+
+## Skill File Structure
+\`\`\`
+.cursor/
+└── skills/
+    └── react-component/
+        ├── skill.md       # Main instructions
+        └── examples/       # Optional examples
+            └── Button.tsx
+\`\`\`
+
+## Example skill.md
+\`\`\`markdown
+# React Component Generator
+
+When asked to create a React component:
+1. Use TypeScript with proper interfaces
+2. Include proper prop types
+3. Add JSDoc documentation
+4. Follow existing patterns in the codebase
+\`\`\`
+
+## Project Rules (.cursor/rules/)
+You can also use \`.cursor/rules/\` with \`.mdc\` files for project-wide guidelines:
+- Keep rules under 500 lines
+- Use concrete names and descriptions
+- Rules can be applied globally, locally, or by file patterns`,
+            // MCP Configuration
+            mcpSupported: true,
+            mcpGuide: `# MCP Setup for Cursor
+
+## Configuration Location
+MCP servers are configured in Cursor settings under "MCP Servers" section.
+
+## Adding an MCP Server
+1. Open Cursor Settings (Cmd+,)
+2. Navigate to "MCP Servers" section
+3. Click "Add New MCP Server"
+4. Provide server name and command/URL
+
+## Configuration File
+You can also configure via \`mcp.json\`:
+\`\`\`json
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/dir"]
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/mcp-server-brave-search"],
+      "env": {
+        "BRAVE_API_KEY": "your-key-here"
+      }
+    }
+  }
+}
+\`\`\`
+
+## Popular MCP Servers for Cursor
+- **Filesystem**: Direct file access
+- **Brave Search**: Web search integration
+- **GitHub**: PR and issue management
+- **Database**: SQL query execution
+
+## Tips
+- Use environment variables for API keys
+- Limit filesystem access to specific directories
+- Test servers with simple commands first`,
+            mcpConfigPath: "mcp.json or Cursor Settings",
+            // Best Practices
+            bestPractices: [
+                "Use @Files, @Folders, @Code, @Docs, and @Web references to provide specific context in prompts",
+                "Create .cursorignore and .cursorindexignore to exclude large or irrelevant files from AI context",
+                "Write focused, composable .mdc rules under 500 lines with concrete names",
+                "Use Agent mode for autonomous task execution, Ask mode for understanding and planning",
+                "Define project-specific rules in .cursor/rules/ as .mdc files for AI to understand conventions",
+                "Set global preferences like response language and coding principles via User Rules in settings",
+                "Use environment variables for sensitive data instead of hardcoding API keys",
+                "Restrict MCP server filesystem access to specific directories for security",
+                "Regularly update MCP server packages to patch vulnerabilities",
+                "Use local configurations for project-specific MCP servers to optimize performance",
+                "Implement caching in custom servers for faster access to frequent data",
+                "Version control your MCP configurations for team collaboration",
+            ],
         },
         {
             platformId: "claude-code",
@@ -188,6 +285,131 @@ Extend Claude with external data sources:
                 "Review all file changes before approving",
                 "Use with CI/CD: claude -p 'task' in GitHub Actions",
                 "MCP integration: Connect Drive, Jira, Figma, Slack",
+            ],
+            // Skills Configuration
+            skillsPath: ".claude/skills/<name>/",
+            skillsGuide: `# Using Skills in Claude Code
+
+## Skills Directory
+Claude Code loads skills from \`.claude/skills/<name>/\` directories.
+
+## Creating a Skill
+1. Create the directory: \`mkdir -p .claude/skills/my-skill\`
+2. Add a \`SKILL.md\` file with instructions
+3. Skills are automatically discovered
+
+## Skill File Structure
+\`\`\`
+.claude/
+└── skills/
+    └── api-generator/
+        ├── SKILL.md       # Main instructions
+        ├── templates/      # Optional templates
+        └── examples/       # Example outputs
+\`\`\`
+
+## Example SKILL.md
+\`\`\`markdown
+# API Route Generator
+
+When generating API routes:
+1. Use proper HTTP methods (GET, POST, PUT, DELETE)
+2. Validate all inputs with Zod
+3. Return consistent error responses
+4. Add rate limiting for public endpoints
+5. Include OpenAPI documentation comments
+\`\`\`
+
+## CLAUDE.md File
+Place a \`CLAUDE.md\` at your project root for project-wide context:
+- Common bash commands
+- Core files and architecture
+- Coding style guidelines
+- Testing procedures
+- Repository conventions
+
+Claude automatically incorporates this into its context.`,
+            // MCP Configuration
+            mcpSupported: true,
+            mcpGuide: `# MCP Setup for Claude Code
+
+## Configuration Methods
+
+### 1. CLI Commands (Quick Setup)
+\`\`\`bash
+claude mcp add github --scope user
+claude mcp add filesystem /path/to/project --scope project
+\`\`\`
+
+### 2. Configuration Files (Recommended)
+Edit configuration files directly for complex setups:
+
+**User Config (~/.claude.json):**
+\`\`\`json
+{
+  "mcpServers": {
+    "perplexity": {
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/mcp-perplexity"],
+      "env": { "PERPLEXITY_API_KEY": "your-key" }
+    }
+  }
+}
+\`\`\`
+
+**Project Config (.mcp.json):**
+\`\`\`json
+{
+  "mcpServers": {
+    "database": {
+      "command": "npx",
+      "args": ["-y", "@mcp/postgres", "postgresql://..."]
+    }
+  }
+}
+\`\`\`
+
+## Installation Scopes
+- **Local**: Personal, experimental (current session only)
+- **Project**: Team-shared (.mcp.json in project root)
+- **User**: Personal tools across projects (~/.claude.json)
+
+## Precedence
+Local > Project > User (local overrides project overrides user)
+
+## Popular MCP Integrations
+- **GitHub**: PRs, issues, CI/CD management
+- **Perplexity**: Real-time API documentation research
+- **Sequential Thinking**: Complex task breakdown
+- **Context7**: Version-specific library docs
+- **Sentry**: Error monitoring integration
+- **Figma/Notion**: Design and documentation workflows
+
+## Environment Variables
+\`\`\`bash
+claude mcp add myserver --env API_KEY=secret
+\`\`\`
+
+## Troubleshooting
+\`\`\`bash
+claude mcp list          # Show configured servers
+claude mcp test myserver # Test server connection
+\`\`\``,
+            mcpConfigPath: "~/.claude.json (user) or .mcp.json (project)",
+            // Best Practices
+            bestPractices: [
+                "Use CLAUDE.md files at project root to document bash commands, core files, coding style, and testing procedures",
+                "Plan before coding: instruct Claude to formulate a plan and approve it before code generation",
+                "Use Escape key to pause Claude and redirect or expand instructions while preserving context",
+                "Double-tap Escape to revisit and edit previous prompts",
+                "Multi-task by establishing multiple Git checkouts in separate folders with Claude in each",
+                "Only install trusted MCP servers as they operate with full system access",
+                "Use project scope for testing MCP configurations before user-wide deployment",
+                "Regularly update API keys, especially GitHub tokens",
+                "Always review MCP server code to understand requested permissions",
+                "Test MCP servers with simple commands after configuration",
+                "For Windows: use cmd /c wrapper for npx commands and forward slashes in paths",
+                "Set environment variables using --env flag, adjust timeouts with MCP_TIMEOUT",
             ],
         },
         {
@@ -496,6 +718,107 @@ Create \`opencode.json\` in your project:
                 "Sessions saved to SQLite automatically",
                 "opencode agent create: Make custom agent",
             ],
+            // Skills Configuration
+            skillsPath: ".opencode/skill/<name>/",
+            skillsGuide: `# Using Skills in OpenCode
+
+## Skills Directory
+OpenCode loads skills from \`.opencode/skill/<name>/\` directories.
+
+## Creating a Skill
+1. Create the directory: \`mkdir -p .opencode/skill/my-skill\`
+2. Add instruction files
+3. Skills are loaded on startup
+
+## Skill File Structure
+\`\`\`
+.opencode/
+└── skill/
+    └── python-api/
+        ├── instructions.md    # Main skill instructions
+        ├── context.md         # Additional context
+        └── examples/          # Example code
+\`\`\`
+
+## Example instructions.md
+\`\`\`markdown
+# Python API Development
+
+When building Python APIs:
+1. Use FastAPI or Flask
+2. Add Pydantic models for validation
+3. Include proper error handling
+4. Add type hints everywhere
+5. Structure with blueprints/routers
+\`\`\`
+
+## Custom Agents
+Create specialized agents beyond skills:
+\`\`\`bash
+opencode agent create
+\`\`\`
+
+Built-in agents:
+- **build**: Full permissions, makes changes
+- **plan**: Read-only analysis and planning`,
+            // MCP Configuration
+            mcpSupported: true,
+            mcpGuide: `# MCP Support in OpenCode
+
+## Configuration
+OpenCode supports MCP through its configuration file:
+
+**opencode.json:**
+\`\`\`json
+{
+  "model": "gpt-4o",
+  "provider": "openai",
+  "mcp": {
+    "servers": {
+      "filesystem": {
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-filesystem", "./"]
+      }
+    }
+  }
+}
+\`\`\`
+
+## Environment Variables
+Set provider API keys:
+\`\`\`bash
+export OPENAI_API_KEY="..."
+export ANTHROPIC_API_KEY="..."
+export GOOGLE_API_KEY="..."
+\`\`\`
+
+## Tool Chain Integration
+OpenCode integrates with your development tools:
+- LSP (Language Server Protocol) support
+- Git awareness
+- Build tools (npm, pip, cargo)
+
+## Built-in Tools
+The AI has access to:
+- \`glob\`, \`grep\`, \`ls\`: File navigation
+- \`view\`, \`write\`, \`edit\`, \`patch\`: Code operations
+- \`bash\`: Execute shell commands
+- \`fetch\`: Get data from URLs
+- \`sourcegraph\`: Search public code`,
+            mcpConfigPath: "opencode.json",
+            // Best Practices
+            bestPractices: [
+                "Use multiple AI providers for different tasks - OpenAI for speed, Claude for reasoning",
+                "Leverage session persistence to maintain context across coding sessions",
+                "Use the /models command to switch models mid-conversation based on task complexity",
+                "Create custom agents for repetitive workflows using 'opencode agent create'",
+                "Use the plan agent for analysis before the build agent for implementation",
+                "Set up project-specific opencode.json for consistent team configuration",
+                "Pipe output to OpenCode for code review: cat file.py | opencode 'review this'",
+                "Use --continue flag to resume interrupted sessions seamlessly",
+                "Leverage built-in Sourcegraph integration for searching open-source patterns",
+                "Configure LSP integration for intelligent code diagnostics",
+            ],
         },
         {
             platformId: "replit-ai",
@@ -684,6 +1007,558 @@ Advanced code completion:
                 "Enterprise security options",
                 "Works with existing extensions",
                 "Cross-platform: Mac, Windows, Linux",
+            ],
+            // Skills Configuration
+            skillsPath: ".windsurf/skills/<name>/",
+            skillsGuide: `# Using Skills in Windsurf
+
+## Skills Directory
+Windsurf loads custom configurations from \`.windsurf/skills/<name>/\`.
+
+## Creating a Skill
+1. Create directory: \`mkdir -p .windsurf/skills/my-skill\`
+2. Add instruction files
+3. Skills enhance Cascade and Flow modes
+
+## Cascade Mode
+Multi-file intelligent editing:
+- Add context via skill files
+- Coordinate changes across components
+- Maintain code consistency
+
+## Flow Mode
+Agentic autonomous development:
+- Define task boundaries in skills
+- Set validation criteria
+- Configure auto-review behavior`,
+            // MCP Configuration
+            mcpSupported: false,
+            mcpGuide: `# Windsurf Integration
+
+Windsurf uses Codeium's built-in AI infrastructure rather than MCP.
+
+## Alternative: Codeium Extensions
+- Built-in context providers
+- Integrated search capabilities
+- Native documentation access
+
+## Workflow Integration
+Use Cascade and Flow modes for:
+- Multi-file editing
+- Autonomous task execution
+- Code review and refactoring`,
+            mcpConfigPath: "N/A (uses Codeium infrastructure)",
+            // Best Practices
+            bestPractices: [
+                "Let Cascade scan your entire codebase before starting complex edits",
+                "Use Flow mode for multi-step autonomous tasks with clear completion criteria",
+                "Review all AI-generated changes in diff view before accepting",
+                "Combine Cascade for planning with Flow for execution",
+                "Use Supercomplete inline suggestions for rapid coding",
+                "Leverage existing VSCode extensions alongside Windsurf AI features",
+                "Set up project context files for consistent AI behavior",
+                "Break complex refactoring into smaller, reviewable chunks",
+            ],
+        },
+        // NEW PLATFORMS
+        {
+            platformId: "codex",
+            name: "Codex",
+            tagline: "OpenAI's CLI coding agent",
+            websiteUrl: "https://openai.com/codex",
+            description: "Codex CLI is OpenAI's command-line coding agent that brings GPT-powered code generation directly to your terminal. It can read, modify, and run code within your project directory, with support for multimodal input including screenshots and design specifications.",
+            setupGuide: `# Getting Started with Codex CLI
+
+## Installation
+
+### Via npm (Recommended)
+\`\`\`bash
+npm i -g @openai/codex
+\`\`\`
+
+### Via Homebrew
+\`\`\`bash
+brew install codex
+\`\`\`
+
+## Authentication
+On first run, you'll be prompted to authenticate:
+- ChatGPT account (Plus, Pro, Business, Enterprise)
+- Or OpenAI API key
+
+## Quick Start
+\`\`\`bash
+codex
+\`\`\`
+
+This launches the interactive TUI session.
+
+## Key Features
+
+### Interactive Mode
+Full terminal UI for coding assistance:
+- Multi-file operations
+- Code review integration
+- Test execution
+
+### Single Commands
+\`\`\`bash
+codex "Add error handling to all API routes"
+\`\`\`
+
+### Multimodal Input
+Attach screenshots or design specs:
+\`\`\`bash
+codex --attach design.png "Implement this UI"
+\`\`\`
+
+### Web Search
+Enable real-time documentation lookup:
+\`\`\`bash
+codex --web "How to use the new React 19 API"
+\`\`\`
+
+## Slash Commands
+- \`/model\`: Switch between GPT models
+- \`/approvals\`: Change authorization level
+- \`/new\`: Fresh session
+- \`/diff\`: View Git differences`,
+            cheatSheet: [
+                "codex: Start interactive TUI session",
+                "codex 'prompt': Single-shot command",
+                "--attach: Include screenshots/designs",
+                "--web: Enable web search for docs",
+                "/model: Switch GPT models",
+                "/approvals: Change auth level",
+                "/new: Start fresh session",
+                "/diff: View Git changes",
+                "Included with ChatGPT Plus/Pro/Business",
+                "Runs in Docker sandbox for security",
+            ],
+            // Skills Configuration
+            skillsPath: ".codex/skills/<name>/",
+            skillsGuide: `# Using Skills in Codex
+
+## Skills Directory
+Codex loads skills from \`.codex/skills/<name>/\` directories.
+
+## Creating a Skill
+1. Create directory: \`mkdir -p .codex/skills/my-skill\`
+2. Add a \`skill.md\` with instructions
+3. Skills are auto-loaded on session start
+
+## Skill File Structure
+\`\`\`
+.codex/
+└── skills/
+    └── typescript-api/
+        ├── skill.md         # Main instructions
+        └── templates/       # Code templates
+\`\`\`
+
+## Example skill.md
+\`\`\`markdown
+# TypeScript API Generator
+
+When creating API endpoints:
+1. Use Zod for input validation
+2. Return typed responses
+3. Add OpenAPI documentation
+4. Include rate limiting headers
+\`\`\`
+
+## Prompting Best Practices
+The core principle for Codex models is "less is more":
+- Be specific but concise
+- Include constraints upfront
+- Let the model determine implementation details`,
+            // MCP Configuration
+            mcpSupported: false,
+            mcpGuide: `# Codex Integration
+
+Codex CLI uses Docker-based sandboxing rather than MCP.
+
+## Security Model
+- Runs in lightweight container
+- Restricted network access by default
+- Isolated from host system
+
+## IDE Integration
+Codex integrates with:
+- VS Code extension
+- Cursor compatibility
+- CI/CD pipelines
+
+## Web Search
+For external context, use the --web flag:
+\`\`\`bash
+codex --web "Find the latest prisma migration syntax"
+\`\`\``,
+            mcpConfigPath: "N/A (Docker-based sandboxing)",
+            // Best Practices
+            bestPractices: [
+                "Craft specific, detailed prompts - quality output depends on prompt clarity",
+                "Use aliases for frequently used configurations to launch quickly",
+                "Master slash commands: /model, /approvals, /new, /diff",
+                "Always review and test generated code thoroughly before committing",
+                "Use --web flag for up-to-date documentation on new APIs and libraries",
+                "Create Git checkpoints before and after each Codex session for easy rollback",
+                "Leverage multimodal input: attach screenshots and designs for UI implementation",
+                "Use Docker sandboxing for additional security when running generated code",
+                "Switch between ChatGPT account and API key auth based on rate limits",
+                "Document AI-generated code usage for team transparency",
+            ],
+        },
+        {
+            platformId: "amp",
+            name: "Amp",
+            tagline: "Sourcegraph's agentic coding assistant",
+            websiteUrl: "https://sourcegraph.com/amp",
+            description: "Amp is Sourcegraph's AI coding agent designed for team collaboration. It features autonomous reasoning, comprehensive code editing, and can work as both a VS Code extension and CLI tool. With 200K token context and thread sharing, it excels at complex multi-file tasks.",
+            setupGuide: `# Getting Started with Amp
+
+## Installation
+
+### VS Code Extension
+1. Open Extensions (Cmd+Shift+X)
+2. Search "Amp" by Sourcegraph
+3. Install and authenticate
+
+### CLI
+\`\`\`bash
+npm install -g @sourcegraph/amp-cli
+amp auth login
+\`\`\`
+
+## Key Features
+
+### Agentic Coding
+Amp can autonomously:
+- Edit multiple files
+- Run commands
+- Execute tests
+- Iterate on results
+
+### Thread Sharing
+Share conversation threads with teammates:
+- Collaborative problem solving
+- Knowledge transfer
+- Code review assistance
+
+### 200K Token Context
+Generous context window allows:
+- Understanding large codebases
+- Multi-file refactoring
+- Complex architectural changes
+
+### Subagents
+For complex tasks, Amp spawns subagents:
+- Each has own context and tools
+- Keeps main thread clean
+- Handles extensive output
+
+## AGENT.md Files
+Create an \`AGENT.md\` at project root:
+\`\`\`markdown
+# Project Context
+
+## Build Commands
+- \`npm run build\`
+- \`npm test\`
+
+## Code Conventions
+- Use TypeScript strict mode
+- Follow ESLint rules
+
+## Architecture
+- src/api: REST endpoints
+- src/components: React components
+\`\`\``,
+            cheatSheet: [
+                "amp: Start interactive session",
+                "Thread sharing: Collaborate with teammates",
+                "200K token context window",
+                "Subagents: Handle complex multi-step tasks",
+                "AGENT.md: Project context file",
+                "Works in VS Code, Cursor, VSCodium, CLI",
+                "Compact Thread: Manage context efficiently",
+                "New Thread with Summary: Preserve knowledge",
+                "DevContainer compatible",
+                "Enterprise security options",
+            ],
+            // Skills Configuration
+            skillsPath: ".agents/skills/<name>/",
+            skillsGuide: `# Using Skills in Amp
+
+## Skills Directory
+Amp loads Agent Skills from \`.agents/skills/<name>/\` directories (workspace) or \`~/.config/agents/skills/\` (user-level).
+
+## What Are Agent Skills?
+Domain-specific instruction sets that:
+- Lazily load specific tool-use instructions
+- Improve tool performance
+- Maintain context efficiency
+
+## Creating a Skill
+1. Create directory: \`mkdir -p .agents/skills/react-testing\`
+2. Add a \`skill.md\` with instructions
+3. Skills auto-load based on context
+
+## Skill File Structure
+\`\`\`
+.agents/
+└── skills/
+    └── react-testing/
+        ├── skill.md        # Main instructions
+        └── examples/       # Example patterns
+\`\`\`
+
+## Example skill.md
+\`\`\`markdown
+# React Testing Skill
+
+When testing React components:
+1. Use React Testing Library
+2. Test user interactions, not implementation
+3. Use userEvent for interactions
+4. Assert on accessible elements
+5. Mock network requests with MSW
+\`\`\`
+
+## Custom Slash Commands
+Define in \`.agents/commands/\` folder:
+\`\`\`
+.agents/
+└── commands/
+    └── deploy.md
+\`\`\``,
+            // MCP Configuration
+            mcpSupported: true,
+            mcpGuide: `# MCP Setup for Amp
+
+## Configuration Location
+Global settings: \`~/.config/amp/settings.json\`
+
+## Adding MCP Servers
+\`\`\`json
+{
+  "mcpServers": {
+    "read_web_page": {
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/mcp-server-web"]
+    },
+    "mermaid": {
+      "command": "npx",
+      "args": ["-y", "@mcp/mermaid-server"]
+    }
+  }
+}
+\`\`\`
+
+## Built-in MCP Servers
+- **read_web_page**: Fetch and read web content
+- **Mermaid charting**: Generate diagrams
+
+## AGENT.md for Context
+Provide Amp with project context:
+\`\`\`markdown
+# Project
+
+## MCP Servers Available
+- Mermaid for diagrams
+- Web reader for documentation
+
+## When to Use MCP
+- Fetch library documentation
+- Generate architecture diagrams
+\`\`\`
+
+## Security Notes
+- Review server code for permissions
+- Run latest versions
+- Be cautious with configuration modification capabilities`,
+            mcpConfigPath: "~/.config/amp/settings.json",
+            // Best Practices
+            bestPractices: [
+                "Use AGENT.md files to provide context about codebase, build commands, and conventions",
+                "Create sub-project specific AGENT.md files for large monorepos",
+                "Define custom slash commands in .agents/commands/ for automated workflows",
+                "Plan before execution: discuss and refine plans before implementing code",
+                "Break complex tasks into smaller, manageable pieces for the agent",
+                "Leverage Amp's iteration capability on test results and code output",
+                "Use Compact Thread and New Thread with Summary to manage 200K context",
+                "Use subagents for multi-step tasks producing extensive output",
+                "Share threads with teammates for collaborative problem-solving",
+                "Integrate DAST tools to identify security issues in AI-generated code",
+            ],
+        },
+        {
+            platformId: "antigravity",
+            name: "Antigravity",
+            tagline: "Google's agentic AI coding IDE",
+            websiteUrl: "https://deepmind.google/antigravity",
+            description: "Antigravity is Google DeepMind's agentic AI coding assistant built on Gemini. It offers a full IDE experience with task boundaries, artifact management, and deep integration with development workflows. Features include browser automation, image generation, and comprehensive project management.",
+            setupGuide: `# Getting Started with Antigravity
+
+## Access
+Antigravity is available through:
+- Google DeepMind IDE
+- VS Code with Gemini extension
+- CLI via Gemini CLI
+
+## Key Concepts
+
+### Task Boundaries
+Structure your work with explicit task phases:
+- **PLANNING**: Research and design
+- **EXECUTION**: Write and modify code
+- **VERIFICATION**: Test and validate
+
+### Artifacts
+Create and manage project documents:
+- \`implementation_plan.md\`: Design proposals
+- \`task.md\`: Progress tracking
+- \`walkthrough.md\`: Proof of work
+
+### Workflows
+Define reusable processes in \`.agent/workflows/\`:
+\`\`\`markdown
+---
+description: How to deploy the application
+---
+1. Run tests
+2. Build production bundle
+3. Deploy to staging
+4. Run smoke tests
+5. Promote to production
+\`\`\`
+
+## Tool Access
+Antigravity can:
+- Read and write files
+- Run terminal commands
+- Control browser for testing
+- Generate images
+- Search the web
+
+## Best Practices
+- Use PLANNING mode before coding
+- Create implementation plans for user review
+- Track progress in task.md
+- Document completed work in walkthrough.md`,
+            cheatSheet: [
+                "Task boundaries: PLANNING, EXECUTION, VERIFICATION",
+                "Artifacts: implementation_plan.md, task.md, walkthrough.md",
+                "Workflows: .agent/workflows/ for reusable processes",
+                "// turbo annotation for auto-run commands",
+                "Browser automation for E2E testing",
+                "Image generation for assets and mockups",
+                "Web search for real-time information",
+                "Multi-file editing with smart context",
+                "Built on Gemini models",
+                "Integrated development environment",
+            ],
+            // Skills Configuration
+            skillsPath: ".agent/skills/<name>/",
+            skillsGuide: `# Using Skills in Antigravity
+
+## Skills Directory
+Antigravity loads skills from \`.agent/skills/<name>/\` directories.
+
+## Creating a Skill
+1. Create directory: \`mkdir -p .agent/skills/nextjs-app\`
+2. Add a \`skill.md\` with instructions
+3. Skills enhance AI capabilities for specific domains
+
+## Skill File Structure
+\`\`\`
+.agent/
+├── skills/
+│   └── nextjs-app/
+│       ├── skill.md         # Main instructions
+│       └── templates/       # Code patterns
+└── workflows/
+    └── deploy.md            # Reusable workflows
+\`\`\`
+
+## Example skill.md
+\`\`\`markdown
+# Next.js App Development
+
+When building Next.js applications:
+1. Use App Router (not Pages)
+2. Server Components by default
+3. 'use client' only when needed
+4. Type all props with TypeScript
+5. Use Tailwind for styling
+6. Follow existing patterns in codebase
+\`\`\`
+
+## Workflows
+Define step-by-step processes:
+\`\`\`yaml
+---
+description: Run full test suite
+---
+// turbo
+1. npm run lint
+// turbo
+2. npm run test
+3. npm run build
+\`\`\`
+
+The \`// turbo\` annotation auto-runs that step.`,
+            // MCP Configuration
+            mcpSupported: true,
+            mcpGuide: `# MCP Support in Antigravity
+
+## Configuration
+Antigravity supports MCP through the Gemini infrastructure.
+
+## Built-in Capabilities
+Unlike traditional MCP, Antigravity has native tools:
+- **File System**: Read/write files directly
+- **Terminal**: Run commands with approval
+- **Browser**: Automate web interactions
+- **Image Generation**: Create assets
+- **Web Search**: Real-time information
+
+## .gemini Directory
+User-specific configurations in \`~/.gemini/\`:
+- Preferences and settings
+- Cached information
+- Artifact storage
+
+## Workflows as MCP Alternative
+Define custom tools via workflows:
+\`\`\`markdown
+---
+description: Deploy to production
+---
+1. Run pre-deployment checks
+2. Build the application
+3. Deploy to cloud provider
+\`\`\`
+
+## Integration Points
+- Google Cloud services
+- Vertex AI
+- Google Workspace (Docs, Sheets)`,
+            mcpConfigPath: "~/.gemini/ or .agent/workflows/",
+            // Best Practices
+            bestPractices: [
+                "Use task_boundary tool to structure work into PLANNING, EXECUTION, VERIFICATION phases",
+                "Create implementation_plan.md for complex changes and get user approval before coding",
+                "Track progress in task.md with [ ], [/], and [x] checkboxes",
+                "Document completed work in walkthrough.md with embedded screenshots",
+                "Define reusable workflows in .agent/workflows/ with // turbo annotations",
+                "Use notify_user tool to communicate and get feedback during tasks",
+                "Leverage browser_subagent for E2E testing and web interactions",
+                "Generate images for UI mockups and visual assets",
+                "Use web search for real-time documentation and API information",
+                "Structure artifacts with proper markdown formatting and file links",
+                "Create skills for domain-specific coding patterns",
+                "Use absolute paths for all file operations",
             ],
         },
     ];
@@ -2207,6 +3082,309 @@ jobs:
             provider: "community",
             featured: false,
             useCount: 2340,
+        },
+        // NEW SKILLS with proper SKILL.md format
+        {
+            name: "Commit Message Generator",
+            slug: "commit-helper",
+            tagline: "Generates clear commit messages from git diffs",
+            description: "Creates well-structured commit messages following conventional commits format. Analyzes staged changes and suggests appropriate commit messages with summary and detailed description.",
+            instructions: `# Generating Commit Messages
+
+## Instructions
+1. Run \`git diff --staged\` to see changes
+2. I'll suggest a commit message with:
+   - Summary under 50 characters
+   - Detailed description
+   - Affected components
+
+## Best Practices
+- Use present tense ("Add feature" not "Added feature")
+- Use imperative mood ("Move cursor to..." not "Moves cursor to...")
+- Explain what and why, not how
+- Reference issues if applicable
+
+## Conventional Commits Format
+\`\`\`
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+\`\`\`
+
+Types: feat, fix, docs, style, refactor, perf, test, chore
+
+## Example
+\`\`\`
+feat(auth): add OAuth2 login support
+
+- Implement Google OAuth2 provider
+- Add session management with JWT
+- Include remember-me functionality
+
+Closes #123
+\`\`\``,
+            category: "workflow",
+            platforms: ["claude-code", "cursor", "gemini-cli", "opencode", "codex"],
+            examples: ["Write commit message", "Create PR description", "Generate changelog"],
+            triggers: ["commit", "git commit", "write commit message", "conventional commit"],
+            provider: "official",
+            featured: true,
+            useCount: 8920,
+        },
+        {
+            name: "Code Explainer",
+            slug: "explaining-code",
+            tagline: "Explains code with visual diagrams and analogies",
+            description: "Provides clear explanations of code using everyday analogies, ASCII diagrams, and step-by-step walkthroughs. Perfect for learning and understanding complex codebases.",
+            instructions: `# Explaining Code
+
+When explaining code, always include:
+
+## 1. Start with an Analogy
+Compare the code to something from everyday life to build intuition.
+
+## 2. Draw a Diagram
+Use ASCII art to show the flow, structure, or relationships:
+
+\`\`\`
+┌─────────┐    ┌─────────┐    ┌─────────┐
+│ Request │───▶│ Handler │───▶│ Response│
+└─────────┘    └─────────┘    └─────────┘
+        ▲              │
+        └──────────────┘
+            (loop)
+\`\`\`
+
+## 3. Walk Through the Code
+Explain step-by-step what happens when the code runs.
+
+## 4. Highlight a Gotcha
+What's a common mistake or misconception?
+
+## Guidelines
+- Keep explanations conversational
+- For complex concepts, use multiple analogies
+- Show before/after comparisons when relevant
+- Use syntax highlighting for code snippets`,
+            category: "document",
+            platforms: ["claude-code", "cursor", "gemini-cli", "opencode", "codex"],
+            examples: ["Explain this function", "How does this work?", "Walk me through this code"],
+            triggers: ["explain", "how does this work", "what does this do", "understand code"],
+            provider: "official",
+            featured: true,
+            useCount: 7650,
+        },
+        {
+            name: "PR Creator",
+            slug: "create-pr",
+            tagline: "Creates GitHub pull requests with properly formatted content",
+            description: "Generates well-structured pull request descriptions with context, changes summary, testing notes, and proper formatting. Follows best practices for PR reviews.",
+            instructions: `# Creating Pull Requests
+
+## PR Template Structure
+
+### Title
+Format: \`<type>: <brief description>\`
+Example: \`feat: Add user authentication flow\`
+
+### Description
+\`\`\`markdown
+## Summary
+Brief description of what this PR does.
+
+## Changes
+- [ ] Change 1
+- [ ] Change 2
+- [ ] Change 3
+
+## Testing
+How was this tested?
+- Unit tests added/updated
+- Manual testing steps
+
+## Screenshots (if applicable)
+Before | After
+
+## Related Issues
+Closes #issue_number
+\`\`\`
+
+## Best Practices
+- Keep PRs focused and small
+- Include context for reviewers
+- Add testing instructions
+- Tag relevant reviewers
+- Link related issues`,
+            category: "workflow",
+            platforms: ["claude-code", "cursor", "gemini-cli", "opencode", "codex"],
+            examples: ["Create a pull request", "Write PR description", "/pr"],
+            triggers: ["create pr", "pull request", "/pr", "open pr"],
+            provider: "official",
+            featured: true,
+            useCount: 6890,
+        },
+        {
+            name: "Test Writer",
+            slug: "testing-expert",
+            tagline: "Writes comprehensive tests with proper coverage",
+            description: "Creates unit, integration, and E2E tests using modern testing frameworks. Follows testing best practices and ensures proper coverage of edge cases.",
+            instructions: `# Writing Tests
+
+## Test Structure (AAA Pattern)
+\`\`\`typescript
+describe('UserService', () => {
+  it('should create a user with valid data', async () => {
+    // Arrange - Set up test data
+    const userData = { name: 'John', email: 'john@test.com' };
+    
+    // Act - Execute the code under test
+    const user = await userService.create(userData);
+    
+    // Assert - Verify the results
+    expect(user.name).toBe('John');
+    expect(user.id).toBeDefined();
+  });
+});
+\`\`\`
+
+## Test Types
+1. **Unit Tests**: Test individual functions/methods
+2. **Integration Tests**: Test component interactions
+3. **E2E Tests**: Test complete user flows
+
+## Best Practices
+- Test behavior, not implementation
+- Use descriptive test names
+- One assertion per test when possible
+- Mock external dependencies
+- Test edge cases and error paths
+- Use parameterized tests for similar cases
+
+## Coverage Targets
+- Statements: 80%+
+- Branches: 75%+
+- Functions: 80%+`,
+            category: "coding",
+            platforms: ["claude-code", "cursor", "gemini-cli", "opencode", "codex", "copilot"],
+            examples: ["Write tests for this function", "Add unit tests", "Create integration tests"],
+            triggers: ["write tests", "add tests", "testing", "unit test", "test coverage"],
+            provider: "community",
+            featured: true,
+            useCount: 5430,
+        },
+        {
+            name: "Refactoring Assistant",
+            slug: "refactoring",
+            tagline: "Improve code quality through systematic refactoring",
+            description: "Identifies code smells and applies appropriate refactoring patterns to improve maintainability, readability, and performance while preserving behavior.",
+            instructions: `# Refactoring Code
+
+## Common Code Smells
+- Long methods (> 20 lines)
+- Large classes (> 200 lines)
+- Duplicate code
+- Deep nesting (> 3 levels)
+- Magic numbers/strings
+- God objects
+
+## Refactoring Patterns
+
+### Extract Method
+\`\`\`typescript
+// Before
+function processOrder(order) {
+  // validate
+  if (!order.id) throw new Error();
+  if (!order.items.length) throw new Error();
+  // calculate
+  let total = 0;
+  for (const item of order.items) {
+    total += item.price * item.qty;
+  }
+  return total;
+}
+
+// After
+function processOrder(order) {
+  validateOrder(order);
+  return calculateTotal(order.items);
+}
+\`\`\`
+
+### Replace Magic Numbers
+\`\`\`typescript
+// Before
+if (user.age >= 18) { ... }
+
+// After
+const LEGAL_AGE = 18;
+if (user.age >= LEGAL_AGE) { ... }
+\`\`\`
+
+## Guidelines
+- Make one refactoring at a time
+- Run tests after each change
+- Keep commits atomic
+- Document significant changes`,
+            category: "coding",
+            platforms: ["claude-code", "cursor", "gemini-cli", "opencode", "codex"],
+            examples: ["Refactor this function", "Clean up this code", "Improve code quality"],
+            triggers: ["refactor", "clean up", "improve code", "code smell"],
+            provider: "community",
+            featured: false,
+            useCount: 4210,
+        },
+        {
+            name: "Debugging Expert",
+            slug: "debugging",
+            tagline: "Systematic debugging and root cause analysis",
+            description: "Provides structured approach to debugging issues, analyzing stack traces, identifying root causes, and suggesting fixes with proper error handling.",
+            instructions: `# Debugging Issues
+
+## Debugging Process
+1. **Reproduce** - Confirm the bug consistently
+2. **Isolate** - Narrow down the cause
+3. **Identify** - Find the root cause
+4. **Fix** - Implement the solution
+5. **Verify** - Confirm the fix works
+6. **Prevent** - Add tests/guards
+
+## Analyzing Errors
+
+### Stack Trace Analysis
+- Start from the bottom (oldest call)
+- Find where your code begins
+- Look for the actual error message
+- Check variable values at that point
+
+### Common Issues
+| Symptom | Likely Cause |
+|---------|-------------|
+| undefined is not a function | Method doesn't exist |
+| Cannot read property of null | Missing null check |
+| Maximum call stack | Infinite recursion |
+| Memory leak | Unclosed resources |
+
+## Debugging Tools
+- \`console.log\` - Quick checks
+- \`debugger\` statement - Breakpoints
+- Chrome DevTools - Full debugging
+- \`node --inspect\` - Node.js debugging
+
+## Questions to Ask
+- What changed recently?
+- Does it happen consistently?
+- What are the exact steps to reproduce?
+- What environment is affected?`,
+            category: "coding",
+            platforms: ["claude-code", "cursor", "gemini-cli", "opencode", "codex", "copilot"],
+            examples: ["Debug this error", "Fix this bug", "Why isn't this working"],
+            triggers: ["debug", "error", "bug", "not working", "fix issue"],
+            provider: "community",
+            featured: true,
+            useCount: 6780,
         },
     ];
 
