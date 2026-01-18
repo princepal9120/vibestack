@@ -277,7 +277,7 @@ export function FeaturedProjectsSection({ projects }: { projects: FeaturedProjec
                     variants={stagger}
                     className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
                 >
-                    {projects.slice(0, 6).map((project, i) => (
+                    {projects.slice(0, 6).map((project) => (
                         <motion.div
                             key={project.id}
                             variants={fadeUp}
@@ -374,7 +374,6 @@ export function FeaturedProjectsSection({ projects }: { projects: FeaturedProjec
     );
 }
 
-
 export function PlatformsSection() {
     const platforms = [
         { id: "cursor", name: "Cursor", icon: CursorIcon },
@@ -386,7 +385,6 @@ export function PlatformsSection() {
         { id: "replit-ai", name: "Replit AI", icon: ReplitIcon },
         { id: "windsurf", name: "Windsurf", icon: WindsurfIcon },
     ];
-
 
     return (
         <section className="border-t border-border py-24 bg-muted/20">
@@ -654,4 +652,3 @@ export function TestimonialsSection() {
         </section>
     );
 }
-
