@@ -166,6 +166,32 @@ export function HeroSection() {
                 </Link>
             </motion.div>
 
+            {/* Product Hunt Badge */}
+            <motion.div
+                initial="hidden"
+                animate="visible"
+                variants={fadeUp}
+                transition={{ duration: 0.5, delay: 0.35 }}
+                className="mt-8 flex justify-center"
+            >
+                <a
+                    href="https://www.producthunt.com/products/vibe-stack?embed=true&utm_source=embed&utm_medium=post_embed"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-3 rounded-full border border-border bg-card px-4 py-2 transition-all hover:scale-105 hover:shadow-md"
+                >
+                    <img
+                        alt="Vibe Stack"
+                        src="https://ph-files.imgix.net/ee6e460c-d429-46c5-ba60-897c11ebfde3.svg?auto=format&fit=crop&w=40&h=40"
+                        className="w-8 h-8 rounded-md"
+                    />
+                    <span className="text-sm font-medium text-foreground">Vibe Stack</span>
+                    <span className="px-3 py-1 bg-[#ff6154] text-white rounded-full text-xs font-semibold">
+                        Product Hunt →
+                    </span>
+                </a>
+            </motion.div>
+
             {/* Stats */}
             <motion.div
                 initial="hidden"
